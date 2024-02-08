@@ -12,20 +12,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="4dp"
-        android:paddingEnd="52dp"
+        android:paddingStart="@dimen/dp_4"
+        android:paddingEnd="@dimen/dp_52"
         android:background="@color/YP_white">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/back_btn"
-            android:layout_width="48dp"
+            android:layout_width="@dimen/dp_48"
             android:layout_height="wrap_content"
-            android:padding="12dp"
+            android:padding="@dimen/dp_12"
             android:backgroundTint="@color/YP_white"
             android:outlineSpotShadowColor="@color/YP_white"
 
             app:icon="@drawable/ic_arrow_back"
-            app:iconSize="@dimen/ic_size"
+            app:iconSize="@dimen/dp_24"
             app:iconTint="@color/YP_black"
             app:cornerRadius="0dp" />
 
@@ -33,21 +33,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:paddingStart="12dp"
-            android:paddingEnd="86dp"
+            android:paddingStart="@dimen/dp_12"
+            android:paddingEnd="@dimen/dp_86"
 
             android:text="@string/settings"
             android:textColor="@color/YP_black"
-            android:textSize="@dimen/heading_text"
-            android:textStyle="bold" />
+            android:textSize="@dimen/heading_text" />
     </LinearLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/settings_options_height"
-        android:layout_marginTop="@dimen/first_element_margin_top"
-        android:paddingStart="@dimen/padding_standard"
-        android:paddingEnd="6dp"
+        android:layout_marginTop="@dimen/dp_24"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_6"
         android:background="@color/YP_white" >
 
 
@@ -66,16 +65,16 @@
             android:layout_height="match_parent"
             android:layout_gravity="end"
             android:gravity="center_vertical"
-            android:paddingVertical="11dp"
-            android:paddingStart="9dp"
+            android:paddingVertical="@dimen/dp_12"
+            android:paddingStart="@dimen/dp_8"
             android:theme="@style/GraySwitch"/>
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/settings_options_height"
-        android:paddingStart="@dimen/padding_standard"
-        android:paddingEnd="@dimen/settings_options_padding_end" >
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_12" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -88,7 +87,7 @@
             android:textSize="@dimen/settings_options" />
 
         <ImageView
-            android:layout_width="@dimen/ic_size"
+            android:layout_width="@dimen/dp_24"
             android:layout_height="match_parent"
             android:layout_gravity="end"
 
@@ -99,8 +98,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/settings_options_height"
-        android:paddingStart="@dimen/padding_standard"
-        android:paddingEnd="@dimen/settings_options_padding_end" >
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_12" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -113,7 +112,7 @@
             android:textSize="@dimen/settings_options" />
 
         <ImageView
-            android:layout_width="@dimen/ic_size"
+            android:layout_width="@dimen/dp_24"
             android:layout_height="match_parent"
             android:layout_gravity="end"
 
@@ -124,8 +123,8 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/settings_options_height"
-        android:paddingStart="@dimen/padding_standard"
-        android:paddingEnd="@dimen/settings_options_padding_end" >
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_12" >
 
         <TextView
             android:layout_width="wrap_content"
@@ -138,7 +137,7 @@
             android:textSize="@dimen/settings_options" />
 
         <ImageView
-            android:layout_width="@dimen/ic_size"
+            android:layout_width="@dimen/dp_24"
             android:layout_height="match_parent"
             android:layout_gravity="end"
 

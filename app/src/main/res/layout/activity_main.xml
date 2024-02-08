@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="@dimen/padding_standard"
+    android:padding="@dimen/dp_12"
     android:background="@color/light_accents" >
     
     <FrameLayout
@@ -17,8 +17,7 @@
             android:text="@string/app_name_main_menu"
             android:textSize="@dimen/heading_text"
             android:textColor="@color/YP_white"
-            android:layout_gravity="start"
-            android:textStyle="bold" />
+            android:layout_gravity="start" />
     </FrameLayout>
 
     <com.google.android.material.button.MaterialButton
@@ -26,22 +25,21 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="@dimen/first_element_margin_top"
-        android:paddingHorizontal="@dimen/padding_standard"
+        android:layout_marginTop="@dimen/dp_24"
+        android:paddingHorizontal="@dimen/dp_12"
         android:backgroundTint="@color/YP_white"
-        app:cornerRadius="@dimen/button_corner_radius"
+        app:cornerRadius="@dimen/dp_16"
 
         app:icon="@drawable/ic_search"
-        app:iconSize="@dimen/ic_size"
+        app:iconSize="@dimen/dp_24"
         app:iconGravity="textStart"
         app:iconTint="@color/YP_black"
-        app:iconPadding="@dimen/from_icon_to_text"
+        app:iconPadding="@dimen/dp_8"
 
         android:text="@string/search_button"
         android:textSize="@dimen/heading_text"
         android:textColor="@color/YP_black"
-        android:textAllCaps="false"
-        android:textStyle="bold" >
+        android:textAllCaps="false" >
     </com.google.android.material.button.MaterialButton>
 
     <com.google.android.material.button.MaterialButton
@@ -49,21 +47,20 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingHorizontal="@dimen/padding_standard"
+        android:paddingHorizontal="@dimen/dp_12"
         android:backgroundTint="@color/YP_white"
-        app:cornerRadius="@dimen/button_corner_radius"
+        app:cornerRadius="@dimen/dp_16"
 
         app:icon="@drawable/ic_media"
-        app:iconSize="@dimen/ic_size"
+        app:iconSize="@dimen/dp_24"
         app:iconGravity="textStart"
         app:iconTint="@color/YP_black"
-        app:iconPadding="@dimen/from_icon_to_text"
+        app:iconPadding="@dimen/dp_8"
 
         android:text="@string/media_button"
         android:textSize="@dimen/heading_text"
         android:textColor="@color/YP_black"
-        android:textAllCaps="false"
-        android:textStyle="bold" >
+        android:textAllCaps="false" >
     </com.google.android.material.button.MaterialButton>
 
     <com.google.android.material.button.MaterialButton
@@ -71,20 +68,19 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:paddingHorizontal="@dimen/padding_standard"
+        android:paddingHorizontal="@dimen/dp_12"
         android:backgroundTint="@color/YP_white"
-        app:cornerRadius="@dimen/button_corner_radius"
+        app:cornerRadius="@dimen/dp_16"
 
         app:icon="@drawable/ic_settings"
-        app:iconSize="@dimen/ic_size"
+        app:iconSize="@dimen/dp_24"
         app:iconGravity="textStart"
         app:iconTint="@color/YP_black"
-        app:iconPadding="@dimen/from_icon_to_text"
+        app:iconPadding="@dimen/dp_8"
 
         android:text="@string/settings"
         android:textSize="@dimen/heading_text"
         android:textColor="@color/YP_black"
-        android:textAllCaps="false"
-        android:textStyle="bold" >
+        android:textAllCaps="false" >
     </com.google.android.material.button.MaterialButton>
 </LinearLayout>

@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <dimen name="dp_4">4dp</dimen>
+    <dimen name="dp_6">6dp</dimen>
+    <dimen name="dp_8">8dp</dimen>
+    <dimen name="dp_12">12dp</dimen>
+    <dimen name="dp_16">16dp</dimen>
+    <dimen name="dp_24">24dp</dimen>
+    <dimen name="dp_52">52dp</dimen>
+    <dimen name="dp_48">48dp</dimen>
+    <dimen name="dp_86">86dp</dimen>
     <dimen name="heading_text">22sp</dimen>
-    <dimen name="ic_size">24dp</dimen>
-    <dimen name="from_icon_to_text">8dp</dimen>
-    <dimen name="button_corner_radius">16dp</dimen>
-    <dimen name="padding_standard">16dp</dimen>
     <dimen name="settings_options">16sp</dimen>
-    <dimen name="settings_options_height">61dp</dimen>
-    <dimen name="settings_options_padding_end">12dp</dimen>
-    <dimen name="first_element_margin_top">24dp</dimen>
+    <dimen name="settings_options_height">60dp</dimen>
 </resources>
