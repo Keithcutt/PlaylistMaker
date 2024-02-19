@@ -4,144 +4,106 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="?attr/colorOnPrimary"
     android:orientation="vertical"
-    android:background="@color/YP_white"
     tools:context=".SettingsActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="?attr/colorOnPrimary"
         android:orientation="horizontal"
         android:paddingStart="@dimen/dp_4"
-        android:paddingEnd="@dimen/dp_52"
-        android:background="@color/YP_white">
+        android:paddingEnd="@dimen/dp_52">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/back_btn"
+            style="@style/HeaderBackButton"
             android:layout_width="@dimen/dp_48"
             android:layout_height="wrap_content"
-            android:padding="@dimen/dp_12"
-            android:backgroundTint="@color/YP_white"
-            android:outlineSpotShadowColor="@color/YP_white"
-
-            app:icon="@drawable/ic_arrow_back"
-            app:iconSize="@dimen/dp_24"
-            app:iconTint="@color/YP_black"
-            app:cornerRadius="0dp" />
+            app:icon="@drawable/ic_arrow_back" />
 
         <TextView
+            style="@style/Title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:paddingStart="@dimen/dp_12"
-            android:paddingEnd="@dimen/dp_86"
-
-            android:text="@string/settings"
-            android:textColor="@color/YP_black"
-            android:textSize="@dimen/heading_text" />
+            android:text="@string/settings" />
     </LinearLayout>
 
-    <FrameLayout
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switch_theme"
+        style="@style/GraySwitch"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/settings_options_height"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginStart="16dp"
         android:layout_marginTop="@dimen/dp_24"
-        android:paddingStart="@dimen/dp_16"
-        android:paddingEnd="@dimen/dp_6"
-        android:background="@color/YP_white" >
+        android:layout_marginEnd="@dimen/dp_6"
+        android:minHeight="@dimen/settings_options_height"
+        android:text="@string/settings_1"
+        android:textColor="?attr/colorOnSecondary"
+        android:textSize="@dimen/sp_16" />
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/settings_options_height"
+        android:paddingStart="@dimen/dp_16"
+        android:paddingEnd="@dimen/dp_12">
 
         <TextView
+            style="@style/SettingsItemsName"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:gravity="center_vertical"
+            android:text="@string/settings_2" />
 
-            android:text="@string/settings_1"
-            android:textColor="@color/setting_text_black"
-            android:textSize="@dimen/settings_options" />
-
-        <com.google.android.material.switchmaterial.SwitchMaterial
-            android:layout_width="wrap_content"
+        <ImageView
+            android:id="@+id/share_btn"
+            style="@style/SettingsItemsIcons"
+            android:layout_width="@dimen/dp_24"
             android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:gravity="center_vertical"
-            android:paddingVertical="@dimen/dp_12"
-            android:paddingStart="@dimen/dp_8"
-            android:theme="@style/GraySwitch"/>
+            android:src="@drawable/ic_share" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/settings_options_height"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/settings_options_height"
         android:paddingStart="@dimen/dp_16"
-        android:paddingEnd="@dimen/dp_12" >
+        android:paddingEnd="@dimen/dp_12">
 
         <TextView
+            style="@style/SettingsItemsName"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:gravity="center_vertical"
-
-            android:text="@string/settings_2"
-            android:textColor="@color/setting_text_black"
-            android:textSize="@dimen/settings_options" />
+            android:text="@string/settings_3" />
 
         <ImageView
+            android:id="@+id/support_btn"
+            style="@style/SettingsItemsIcons"
             android:layout_width="@dimen/dp_24"
             android:layout_height="match_parent"
-            android:layout_gravity="end"
-
-            android:src="@drawable/ic_share"
-            android:scaleType="center" />
+            android:src="@drawable/ic_support" />
     </FrameLayout>
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/settings_options_height"
+        android:layout_height="wrap_content"
+        android:minHeight="@dimen/settings_options_height"
         android:paddingStart="@dimen/dp_16"
-        android:paddingEnd="@dimen/dp_12" >
+        android:paddingEnd="@dimen/dp_12">
 
         <TextView
+            style="@style/SettingsItemsName"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:gravity="center_vertical"
-
-            android:text="@string/settings_3"
-            android:textColor="@color/setting_text_black"
-            android:textSize="@dimen/settings_options" />
+            android:text="@string/settings_4" />
 
         <ImageView
+            android:id="@+id/offer_btn"
+            style="@style/SettingsItemsIcons"
             android:layout_width="@dimen/dp_24"
             android:layout_height="match_parent"
-            android:layout_gravity="end"
-
-            android:src="@drawable/ic_support"
-            android:scaleType="center" />
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/settings_options_height"
-        android:paddingStart="@dimen/dp_16"
-        android:paddingEnd="@dimen/dp_12" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            android:gravity="center_vertical"
-
-            android:text="@string/settings_4"
-            android:textColor="@color/setting_text_black"
-            android:textSize="@dimen/settings_options" />
-
-        <ImageView
-            android:layout_width="@dimen/dp_24"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-
-            android:src="@drawable/ic_arrow_forward"
-            android:scaleType="center" />
+            android:src="@drawable/ic_arrow_forward" />
     </FrameLayout>
 </LinearLayout>
