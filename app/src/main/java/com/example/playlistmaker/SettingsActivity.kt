@@ -19,7 +19,7 @@ class SettingsActivity : AppCompatActivity() {
 
         val shareButton = findViewById<ImageView>(R.id.share_btn)
         shareButton.setOnClickListener {
-            val shareIntent = Intent().apply {
+            Intent().apply {
                 action = Intent.ACTION_SEND
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.share_text))
                 type = "text/plain"
@@ -29,21 +29,22 @@ class SettingsActivity : AppCompatActivity() {
 
         val supportButton = findViewById<ImageView>(R.id.support_btn)
         supportButton.setOnClickListener {
-            val supportIntent = Intent().apply {
+            Intent().apply {
                 action = Intent.ACTION_SENDTO
                 data = Uri.parse("mailto:")
                 putExtra(Intent.EXTRA_EMAIL, arrayListOf(getString(R.string.email_recipient)))
                 putExtra(Intent.EXTRA_SUBJECT, getString(R.string.email_subject))
                 putExtra(Intent.EXTRA_TEXT, getString(R.string.email_text))
+                startActivity(this)
             }
-            startActivity(supportIntent)
         }
 
         val showOfferButton = findViewById<ImageView>(R.id.offer_btn)
         showOfferButton.setOnClickListener {
-            val showOfferIntent = Intent(Intent.ACTION_VIEW)
-            showOfferIntent.data = Uri.parse(getString(R.string.offer_link))
-            startActivity(showOfferIntent)
+            Intent(Intent.ACTION_VIEW).apply{
+                data = Uri.parse(getString(R.string.offer_link))
+                startActivity(this)
+            }
         }
     }
 }

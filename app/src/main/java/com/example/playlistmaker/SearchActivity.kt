@@ -9,9 +9,12 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
+import androidx.core.view.isVisible
 import com.google.android.material.button.MaterialButton
 
 class SearchActivity : AppCompatActivity() {
+
+    private var savedInput: String? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_search)
@@ -41,7 +44,7 @@ class SearchActivity : AppCompatActivity() {
                     savedInput = s.toString()
 
                 }
-                clearButton.visibility = clearButtonVisibility(s)
+                clearButton.isVisible = clearButtonVisibility(s)
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -50,12 +53,8 @@ class SearchActivity : AppCompatActivity() {
         inputEditText.addTextChangedListener(searchBarWatcher)
     }
 
-    private fun clearButtonVisibility(s: CharSequence?): Int {
-        return if (s.isNullOrEmpty()) {
-            View.GONE
-        } else {
-            View.VISIBLE
-        }
+    private fun clearButtonVisibility(s: CharSequence?): Boolean {
+        return !s.isNullOrEmpty()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -68,10 +67,8 @@ class SearchActivity : AppCompatActivity() {
         savedInput = savedInstanceState.getString(TEXT_INPUT, TEXT_DEF)
     }
 
-    companion object {
+    private companion object {
         const val TEXT_INPUT = "TEXT_INPUT"
         const val TEXT_DEF = ""
     }
-
-    private var savedInput: String? = null
 }
