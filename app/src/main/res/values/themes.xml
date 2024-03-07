@@ -5,8 +5,8 @@
         <item name="colorPrimary">@color/YP_blue</item>
         <item name="colorOnPrimary">@color/YP_white</item>
         <item name="colorOnSecondary">@color/YP_black</item>
-        <item name="settingsIconsColor">@color/YP_text_gray</item>
-        <item name="searchBarIcons">@color/YP_text_gray</item>
-        <item name="searchField">@color/YP_light_gray</item>
+        <item name="textGrayToWhite">@color/YP_text_gray</item>
+        <item name="textGrayToBlack">@color/YP_text_gray</item>
+        <item name="lightGrayToWhite">@color/YP_light_gray</item>
     </style>
 </resources>
