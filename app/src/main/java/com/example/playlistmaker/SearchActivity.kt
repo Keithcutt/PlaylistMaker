@@ -18,8 +18,7 @@ class SearchActivity : AppCompatActivity() {
 
     private var savedInput: String? = null
 
-    private val trackList = ArrayList<Track>(
-        listOf(
+    private val trackList = listOf(
             Track(
                 "Smells Like Teen Spirit",
                 "Nirvana",
@@ -51,7 +50,6 @@ class SearchActivity : AppCompatActivity() {
                 "https://is5-ssl.mzstatic.com/image/thumb/Music125/v4/a0/4d/c4/a04dc484-03cc-02aa-fa82-5334fcb4bc16/18UMGIM24878.rgb.jpg/100x100bb.jpg"
             )
         )
-    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

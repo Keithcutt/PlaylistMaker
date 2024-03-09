@@ -27,33 +27,33 @@
             style="@style/TrackItemText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tool:text="Track name" />
+            tool:text="Sandstorm" /> <!-- Скорректировать заглушку -->
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="horizontal" >
 
             <TextView
                 android:id="@+id/artist_name"
                 style="@style/TrackItemText.BottomText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tool:text="Artist name" />
+                tool:text="Darude" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="bottom"
                 android:padding="@dimen/dp_4"
-                android:src="@drawable/ic_dot_3x3" /> <!-- Разобраться с отображением тчк -->
+                android:src="@drawable/ic_dot_3x3" />
 
             <TextView
                 android:id="@+id/track_time"
                 style="@style/TrackItemText.BottomText"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                tool:text="14:88" />
+                android:layout_height="wrap_content"
+                tool:text="13:37" />
 
         </LinearLayout>
 

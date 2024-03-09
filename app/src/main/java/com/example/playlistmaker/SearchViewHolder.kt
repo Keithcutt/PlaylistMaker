@@ -20,12 +20,19 @@ class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         Glide.with(itemView)
             .load(model.artworkUrl)
             .centerCrop()
-            .transform(RoundedCorners(2))
+            .transform(RoundedCorners(dpToPx(2.toFloat(), itemView.context)))
             .placeholder(R.drawable.ic_placeholder)
             .into(cover)
 
         trackName.text = model.trackName
         artistName.text = model.artistName
         trackTime.text = model.trackTime
+    }
+
+    private fun dpToPx(dp: Float, context: Context): Int {
+        return TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            dp,
+            context.resources.displayMetrics).toInt()
     }
 }

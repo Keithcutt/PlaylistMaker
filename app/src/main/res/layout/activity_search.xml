@@ -79,6 +79,7 @@
         android:id="@+id/rv_search"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="@dimen/dp_16" />
+        android:layout_marginTop="@dimen/dp_16"
+        tools:listitem="@layout/track_item" />
 
 </LinearLayout>
