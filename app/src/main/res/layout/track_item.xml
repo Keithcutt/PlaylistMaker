@@ -39,7 +39,7 @@
                 style="@style/TrackItemText.BottomText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tool:text="Darude"/>
+                tool:text="Darude" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -53,8 +53,7 @@
                 style="@style/TrackItemText.BottomText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                tool:text="13:37"
-                android:layout_gravity="start"/>
+                tool:text="13:37" />
 
         </LinearLayout>
 
