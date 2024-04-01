@@ -62,4 +62,13 @@
         <item name="android:textColor">?attr/textGrayToWhite</item>
         <item name="android:textSize">@dimen/sp_12</item>
     </style>
+
+    <style name="searchActivityPlaceholder">
+        <item name="android:fontFamily">@font/ys_display_medium</item>
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+        <item name="android:textSize">@dimen/sp_20</item>
+    </style>
+    android:fontFamily=""
+    android:textColor=""
+    android:textSize=""
 </resources>
