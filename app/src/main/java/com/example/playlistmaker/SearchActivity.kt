@@ -27,7 +27,7 @@ class SearchActivity : AppCompatActivity() {
 
     private companion object {
         const val TEXT_INPUT = "TEXT_INPUT"
-        const val TEXT_DEF = ""
+        const val TEXT_EMPTY = ""
         const val SUCCESFUL_RESPONSE = 200
         const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
     }
@@ -35,11 +35,12 @@ class SearchActivity : AppCompatActivity() {
     private var savedInput: String? = null
     private lateinit var notFoundPlaceholder: LinearLayout
     private lateinit var noInternetConnectionPlaceholder: LinearLayout
-    private lateinit var searchAdapter: SearchAdapter
     private lateinit var rvSearch: RecyclerView
     private lateinit var updateButton: MaterialButton
+    private lateinit var searchAdapter: SearchAdapter
 
-    private lateinit var searchHistoryAdapter: SearchAdapter
+    private lateinit var rvSearchHistory: RecyclerView
+    private lateinit var searchHistory: SearchHistory
 
     private val foundTracks: MutableList<Track> = mutableListOf()
 
@@ -65,7 +66,7 @@ class SearchActivity : AppCompatActivity() {
         val clearButton = findViewById<ImageView>(R.id.clear_icon)
 
         clearButton.setOnClickListener {
-            searchField.setText(TEXT_DEF)
+            searchField.setText(TEXT_EMPTY)
 
             foundTracks.clear()
             searchAdapter.notifyDataSetChanged()
@@ -80,11 +81,9 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val sharedPreferences = getSharedPreferences(SEARCH_HISTORY_PREFERENCES, MODE_PRIVATE)
-        val searchHistory = SearchHistory(sharedPreferences)
+        searchHistory = SearchHistory(sharedPreferences)
         val searchHistoryViewGroup = findViewById<LinearLayout>(R.id.search_history_viewgroup)
-        searchHistoryAdapter = SearchAdapter(searchHistory.getSearchHistory()) {
-            searchHistory.save(it)
-        } //треки и лямбда для сохранения трека
+
 
         val searchFieldWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -96,7 +95,7 @@ class SearchActivity : AppCompatActivity() {
                 clearButton.isVisible = clearButtonVisibility(s)
 
                 searchHistoryViewGroup.isVisible = searchField.hasFocus() && s?.isEmpty() == true && searchHistory.isSearchHistoryNotEmpty()
-                searchHistoryAdapter.notifyDataSetChanged()
+                // Toast.makeText(this@SearchActivity, searchHistory.getSearchHistory().toString(), Toast.LENGTH_SHORT).show()
                 showSearchHistory()
             }
 
@@ -107,7 +106,12 @@ class SearchActivity : AppCompatActivity() {
 
         rvSearch = findViewById<RecyclerView>(R.id.rv_search)
         rvSearch.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        searchAdapter = SearchAdapter(foundTracks) {}
+
+        // ?
+        searchAdapter = SearchAdapter(foundTracks) {
+            searchHistory.save(it)
+        }
+
         rvSearch.adapter = searchAdapter
 
 
@@ -131,19 +135,17 @@ class SearchActivity : AppCompatActivity() {
 
 
         val clearHistoryButton = findViewById<MaterialButton>(R.id.clear_history_btn)
+        rvSearchHistory = findViewById<RecyclerView>(R.id.rv_search_history)
 
         searchField.setOnFocusChangeListener {view, hasFocus ->
             searchHistoryViewGroup.isVisible = hasFocus && searchField.text.isEmpty() && searchHistory.isSearchHistoryNotEmpty()
-            searchHistoryAdapter.notifyDataSetChanged()
             showSearchHistory()
+            // Toast.makeText(this@SearchActivity, searchHistory.getSearchHistory().size.toString(), Toast.LENGTH_SHORT).show()
         }
 
         clearHistoryButton.setOnClickListener{
-            Toast.makeText(this@SearchActivity, "История поиска очищается", Toast.LENGTH_SHORT).show() // Удлить
-            // вызываем функцию из класса searchhistory
             searchHistory.clear()
             searchHistoryViewGroup.isVisible = false
-            searchHistoryAdapter.notifyDataSetChanged()
         }
 
     }
@@ -163,7 +165,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        savedInput = savedInstanceState.getString(TEXT_INPUT, TEXT_DEF)
+        savedInput = savedInstanceState.getString(TEXT_INPUT, TEXT_EMPTY)
     }
 
     private fun showNotFoundMessage(isTurnedOn: Boolean) {
@@ -180,8 +182,9 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showSearchHistory() {
-        val rvSearchHistory = findViewById<RecyclerView>(R.id.rv_search_history)
-        rvSearchHistory.adapter = searchHistoryAdapter
+        searchAdapter = SearchAdapter(searchHistory.getSearchHistory()) {}
+        searchAdapter.notifyDataSetChanged()
+        rvSearchHistory.adapter = searchAdapter
     }
 
     private fun searchQuery() {

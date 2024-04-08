@@ -25,9 +25,10 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
     }
 
     fun save(track: Track) {
-        searchedTracks.forEach {
-            if (track.trackId == it.trackId) {
-                searchedTracks.remove(it)
+        for (i in searchedTracks) {
+            if (track.trackId == i.trackId) {
+                searchedTracks.remove(i)
+                break
             }
         }
         searchedTracks.add(0, track)
