@@ -42,7 +42,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var rvSearchHistory: RecyclerView
     private lateinit var searchHistory: SearchHistory
 
-    private val foundTracks: MutableList<Track> = mutableListOf()
+    private var foundTracks: MutableList<Track> = mutableListOf()
 
 
     private val retrofit = Retrofit.Builder()
@@ -68,11 +68,11 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             searchField.setText(TEXT_EMPTY)
 
-            foundTracks.clear()
-            searchAdapter.notifyDataSetChanged()
             rvSearch.isVisible = false
             showNotFoundMessage(false)
             showNoInternetConnectionMessage(false)
+
+            showSearchHistory()
 
 
             val inputMethodManager =
@@ -95,7 +95,6 @@ class SearchActivity : AppCompatActivity() {
                 clearButton.isVisible = clearButtonVisibility(s)
 
                 searchHistoryViewGroup.isVisible = searchField.hasFocus() && s?.isEmpty() == true && searchHistory.isSearchHistoryNotEmpty()
-                // Toast.makeText(this@SearchActivity, searchHistory.getSearchHistory().toString(), Toast.LENGTH_SHORT).show()
                 showSearchHistory()
             }
 
@@ -104,10 +103,8 @@ class SearchActivity : AppCompatActivity() {
 
         searchField.addTextChangedListener(searchFieldWatcher)
 
-        rvSearch = findViewById<RecyclerView>(R.id.rv_search)
+        rvSearch = findViewById(R.id.rv_search)
         rvSearch.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-
-        // ?
         searchAdapter = SearchAdapter(foundTracks) {
             searchHistory.save(it)
         }
@@ -135,12 +132,11 @@ class SearchActivity : AppCompatActivity() {
 
 
         val clearHistoryButton = findViewById<MaterialButton>(R.id.clear_history_btn)
-        rvSearchHistory = findViewById<RecyclerView>(R.id.rv_search_history)
+        rvSearchHistory = findViewById(R.id.rv_search_history)
 
-        searchField.setOnFocusChangeListener {view, hasFocus ->
+        searchField.setOnFocusChangeListener {_, hasFocus ->
             searchHistoryViewGroup.isVisible = hasFocus && searchField.text.isEmpty() && searchHistory.isSearchHistoryNotEmpty()
             showSearchHistory()
-            // Toast.makeText(this@SearchActivity, searchHistory.getSearchHistory().size.toString(), Toast.LENGTH_SHORT).show()
         }
 
         clearHistoryButton.setOnClickListener{
@@ -182,9 +178,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun showSearchHistory() {
-        searchAdapter = SearchAdapter(searchHistory.getSearchHistory()) {}
+        foundTracks.clear()
+        foundTracks.addAll(searchHistory.getSearchHistory())
         searchAdapter.notifyDataSetChanged()
         rvSearchHistory.adapter = searchAdapter
+
     }
 
     private fun searchQuery() {

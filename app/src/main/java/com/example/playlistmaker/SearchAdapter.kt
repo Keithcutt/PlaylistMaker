@@ -18,10 +18,7 @@ class SearchAdapter(
     override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener{
-            // Toast.makeText(holder.itemView.context, "Сохранение трека в список", Toast.LENGTH_SHORT).show() // Удалить
-
             trackToSave.setOnTrackClickListener(tracks[position])
-            // trackToSave.onTrackClickListener(Track("Shooting star", "Smash mouth", 14882280.toLong(), "", 13124))
         }
     }
 
