@@ -73,7 +73,8 @@
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/dp_16"
         android:visibility="gone"
-        tools:listitem="@layout/track_item" />
+        tools:listitem="@layout/track_item"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
     <LinearLayout
         android:id="@+id/placeholder_not_found"
@@ -134,8 +135,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_45"
         android:orientation="vertical"
-        android:visibility="gone"
-        android:scrollbars="vertical"> <!-- Сделать невидимым -->
+        android:scrollbars="vertical"
+        android:visibility="gone">
 
         <TextView
             style="@style/SearchActivityMessages"
@@ -150,9 +151,9 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             tools:itemCount="3"
-            tools:listitem="@layout/track_item"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            tools:listitem="@layout/track_item" />
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/clear_history_btn"

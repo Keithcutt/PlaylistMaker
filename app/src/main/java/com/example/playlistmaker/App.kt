@@ -14,7 +14,7 @@ class App : Application() {
         private const val DARK_THEME = "key_for_theme_switcher"
     }
 
-    var darkTheme = false
+    private var darkTheme = false
     private lateinit var sharedPreferences : SharedPreferences
 
     override fun onCreate() {
@@ -44,4 +44,6 @@ class App : Application() {
             }
         )
     }
+
+    fun isDarkThemeEnabled() = darkTheme
 }

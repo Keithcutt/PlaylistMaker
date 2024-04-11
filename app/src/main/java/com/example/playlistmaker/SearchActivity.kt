@@ -5,12 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -32,18 +32,20 @@ class SearchActivity : AppCompatActivity() {
         const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
     }
 
-    private var savedInput: String? = null
     private lateinit var notFoundPlaceholder: LinearLayout
     private lateinit var noInternetConnectionPlaceholder: LinearLayout
     private lateinit var rvSearch: RecyclerView
     private lateinit var updateButton: MaterialButton
     private lateinit var searchAdapter: SearchAdapter
+    private lateinit var clearButton: ImageView
+    private lateinit var searchField: EditText
 
     private lateinit var rvSearchHistory: RecyclerView
     private lateinit var searchHistory: SearchHistory
+    private lateinit var searchHistoryViewGroup: LinearLayout
 
+    private var savedInput: String? = null
     private var foundTracks: MutableList<Track> = mutableListOf()
-
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com")
@@ -61,29 +63,38 @@ class SearchActivity : AppCompatActivity() {
             finish()
         }
 
-        val searchField = findViewById<EditText>(R.id.search_bar)
-        savedInstanceState ?: searchField.setText(savedInput)
-        val clearButton = findViewById<ImageView>(R.id.clear_icon)
+        rvSearch = findViewById(R.id.rv_search)
+        createSearchAdapter()
 
+        notFoundPlaceholder = findViewById(R.id.placeholder_not_found)
+        noInternetConnectionPlaceholder = findViewById(R.id.placeholder_no_internet)
+        updateButton = findViewById(R.id.update_btn)
+        updateButton.setOnClickListener {
+            searchQuery()
+        }
+
+        createSearchHistoryHandler()
+        rvSearchHistory = findViewById(R.id.rv_search_history)
+        searchHistoryViewGroup = findViewById(R.id.search_history_viewgroup)
+        val clearHistoryButton = findViewById<MaterialButton>(R.id.clear_history_btn)
+        clearHistoryButton.setOnClickListener{
+            searchHistory.clear()
+            searchHistoryViewGroup.isVisible = false
+        }
+
+
+        searchField = findViewById<EditText>(R.id.search_bar)
+        savedInstanceState ?: searchField.setText(savedInput)
+
+        clearButton = findViewById<ImageView>(R.id.clear_icon)
         clearButton.setOnClickListener {
             searchField.setText(TEXT_EMPTY)
-
             rvSearch.isVisible = false
             showNotFoundMessage(false)
             showNoInternetConnectionMessage(false)
-
             showSearchHistory()
-
-
-            val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
+            hideKeyboard(it)
         }
-
-        val sharedPreferences = getSharedPreferences(SEARCH_HISTORY_PREFERENCES, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPreferences)
-        val searchHistoryViewGroup = findViewById<LinearLayout>(R.id.search_history_viewgroup)
-
 
         val searchFieldWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -91,29 +102,24 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!s.isNullOrEmpty()) {
                     savedInput = s.toString()
+
                 }
                 clearButton.isVisible = clearButtonVisibility(s)
 
-                searchHistoryViewGroup.isVisible = searchField.hasFocus() && s?.isEmpty() == true && searchHistory.isSearchHistoryNotEmpty()
-                showSearchHistory()
+                if (searchField.hasFocus() && s?.isEmpty() == true && searchHistory.isSearchHistoryNotEmpty()) {
+                    showNoInternetConnectionMessage(false)
+                    showNotFoundMessage(false)
+                    showSearchHistory()
+
+                } else {
+                    searchHistoryViewGroup.isVisible = false
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         }
 
         searchField.addTextChangedListener(searchFieldWatcher)
-
-        rvSearch = findViewById(R.id.rv_search)
-        rvSearch.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        searchAdapter = SearchAdapter(foundTracks) {
-            searchHistory.save(it)
-        }
-
-        rvSearch.adapter = searchAdapter
-
-
-        notFoundPlaceholder = findViewById(R.id.placeholder_not_found)
-        noInternetConnectionPlaceholder = findViewById(R.id.placeholder_no_internet)
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -123,27 +129,15 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        updateButton = findViewById(R.id.update_btn)
-        updateButton.setOnClickListener {
-            searchQuery()
-        }
-
-
-
-
-        val clearHistoryButton = findViewById<MaterialButton>(R.id.clear_history_btn)
-        rvSearchHistory = findViewById(R.id.rv_search_history)
-
         searchField.setOnFocusChangeListener {_, hasFocus ->
-            searchHistoryViewGroup.isVisible = hasFocus && searchField.text.isEmpty() && searchHistory.isSearchHistoryNotEmpty()
-            showSearchHistory()
+            showNotFoundMessage(false)
+            showNoInternetConnectionMessage(false)
+            if (hasFocus && searchField.text.isEmpty() && searchHistory.isSearchHistoryNotEmpty()) {
+                showSearchHistory()
+            } else {
+                searchHistoryViewGroup.isVisible = false
+            }
         }
-
-        clearHistoryButton.setOnClickListener{
-            searchHistory.clear()
-            searchHistoryViewGroup.isVisible = false
-        }
-
     }
 
 
@@ -164,6 +158,12 @@ class SearchActivity : AppCompatActivity() {
         savedInput = savedInstanceState.getString(TEXT_INPUT, TEXT_EMPTY)
     }
 
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
     private fun showNotFoundMessage(isTurnedOn: Boolean) {
         notFoundPlaceholder.isVisible = isTurnedOn
         foundTracks.clear()
@@ -177,47 +177,60 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
+    private fun createSearchHistoryHandler() {
+        val sharedPreferences = getSharedPreferences(SEARCH_HISTORY_PREFERENCES, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPreferences)
+    }
+
+    private fun createSearchAdapter() {
+        searchAdapter = SearchAdapter(foundTracks) {
+            searchHistory.save(it)
+        }
+        rvSearch.adapter = searchAdapter
+    }
+
     private fun showSearchHistory() {
+        searchHistoryViewGroup.isVisible = true
+        rvSearch.isVisible = false
         foundTracks.clear()
         foundTracks.addAll(searchHistory.getSearchHistory())
         searchAdapter.notifyDataSetChanged()
         rvSearchHistory.adapter = searchAdapter
-
     }
 
     private fun searchQuery() {
         savedInput?.let {
-            showNotFoundMessage(false)
-            showNoInternetConnectionMessage(false)
-            iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    when (response.code()) {
-                        SUCCESFUL_RESPONSE -> {
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                rvSearch.isVisible = true
-                                foundTracks.clear()
-                                foundTracks.addAll(response.body()?.results!!)
-                                searchAdapter.notifyDataSetChanged()
-                            } else {
-                                showNotFoundMessage(true)
+                showNotFoundMessage(false)
+                showNoInternetConnectionMessage(false)
+                iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
+                    override fun onResponse(
+                        call: Call<TrackResponse>,
+                        response: Response<TrackResponse>
+                    ) {
+                        when (response.code()) {
+                            SUCCESFUL_RESPONSE -> {
+                                if (response.body()?.results?.isNotEmpty() == true) {
+                                    rvSearch.isVisible = true
+                                    foundTracks.clear()
+                                    foundTracks.addAll(response.body()?.results!!)
+                                    searchAdapter.notifyDataSetChanged()
+                                } else {
+                                    showNotFoundMessage(true)
+                                    rvSearch.isVisible = false
+                                }
+                            }
+                            else -> {
+                                showNoInternetConnectionMessage(true)
                                 rvSearch.isVisible = false
                             }
                         }
-                        else -> {
-                            showNoInternetConnectionMessage(true)
-                            rvSearch.isVisible = false
-                        }
                     }
-                }
 
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    showNoInternetConnectionMessage(true)
-                    rvSearch.isVisible = false
-                }
-            })
+                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                        showNoInternetConnectionMessage(true)
+                        rvSearch.isVisible = false
+                    }
+                })
         }
     }
 }
