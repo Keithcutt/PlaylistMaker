@@ -162,7 +162,7 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        savedInput = savedInstanceState.getString(TEXT_INPUT, TEXT_EMPTY)
+        savedInput = savedInstanceState.getString(TEXT_INPUT, null) //TEXT_EMPTY
     }
 
     private fun hideKeyboard(view: View) {
