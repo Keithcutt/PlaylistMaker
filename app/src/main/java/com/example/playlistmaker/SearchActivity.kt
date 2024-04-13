@@ -188,7 +188,6 @@ class SearchActivity : AppCompatActivity() {
         searchAdapter = SearchAdapter(foundTracks) {
             searchHistory.save(it)
         }
-        rvSearch.adapter = searchAdapter
     }
 
     private fun showSearchHistory() {
@@ -215,6 +214,7 @@ class SearchActivity : AppCompatActivity() {
                                     rvSearch.isVisible = true
                                     foundTracks.clear()
                                     foundTracks.addAll(response.body()?.results!!)
+                                    rvSearch.adapter = searchAdapter
                                     searchAdapter.notifyDataSetChanged()
 
                                 } else {
