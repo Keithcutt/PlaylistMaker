@@ -94,7 +94,7 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             searchField.setText(TEXT_EMPTY)
             rvSearch.isVisible = false
-            savedInput = null
+            //lkdglnkrngldn savedInput = null
             hideKeyboard(it)
         }
 
@@ -206,7 +206,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchQuery(requestText: String?) {
-        requestText?.let {
+        if (requestText?.isBlank() == false) requestText?.let {
                 showNotFoundMessage(false)
                 showNoInternetConnectionMessage(false)
                 iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
