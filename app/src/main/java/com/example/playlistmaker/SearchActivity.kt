@@ -71,7 +71,6 @@ class SearchActivity : AppCompatActivity() {
         updateButton = findViewById(R.id.update_btn)
         updateButton.setOnClickListener {
             searchQuery(savedInput)
-            // нужно внимательно протестировать момент с пустым поиском
         }
 
         createSearchHistoryHandler()
@@ -81,9 +80,6 @@ class SearchActivity : AppCompatActivity() {
         clearHistoryButton.setOnClickListener{
             searchHistory.clear()
             searchHistoryViewGroup.isVisible = false
-            // + очищать еще и список треков, который передается в ресайклер нужно ли?
-            // foundTracks.clear()
-            // searchAdapter.notifyDataSetChanged()
         }
 
 
@@ -94,7 +90,6 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             searchField.setText(TEXT_EMPTY)
             rvSearch.isVisible = false
-            //lkdglnkrngldn savedInput = null
             hideKeyboard(it)
         }
 
