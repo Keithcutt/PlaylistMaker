@@ -70,7 +70,8 @@ class SearchActivity : AppCompatActivity() {
         noInternetConnectionPlaceholder = findViewById(R.id.placeholder_no_internet)
         updateButton = findViewById(R.id.update_btn)
         updateButton.setOnClickListener {
-            searchQuery()
+            searchQuery(savedInput)
+            // нужно внимательно протестировать момент с пустым поиском
         }
 
         createSearchHistoryHandler()
@@ -80,6 +81,9 @@ class SearchActivity : AppCompatActivity() {
         clearHistoryButton.setOnClickListener{
             searchHistory.clear()
             searchHistoryViewGroup.isVisible = false
+            // + очищать еще и список треков, который передается в ресайклер нужно ли?
+            // foundTracks.clear()
+            // searchAdapter.notifyDataSetChanged()
         }
 
 
@@ -90,9 +94,7 @@ class SearchActivity : AppCompatActivity() {
         clearButton.setOnClickListener {
             searchField.setText(TEXT_EMPTY)
             rvSearch.isVisible = false
-            showNotFoundMessage(false)
-            showNoInternetConnectionMessage(false)
-            showSearchHistory()
+            savedInput = null
             hideKeyboard(it)
         }
 
@@ -102,14 +104,15 @@ class SearchActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!s.isNullOrEmpty()) {
                     savedInput = s.toString()
-
                 }
                 clearButton.isVisible = clearButtonVisibility(s)
 
-                if (searchField.hasFocus() && s?.isEmpty() == true && searchHistory.isSearchHistoryNotEmpty()) {
+                if (searchField.hasFocus() && s?.isEmpty() == true) {
                     showNoInternetConnectionMessage(false)
                     showNotFoundMessage(false)
-                    showSearchHistory()
+                    savedInput = null
+
+                    if (searchHistory.isSearchHistoryNotEmpty()) showSearchHistory()
 
                 } else {
                     searchHistoryViewGroup.isVisible = false
@@ -123,17 +126,21 @@ class SearchActivity : AppCompatActivity() {
 
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                searchQuery()
+                searchQuery(savedInput)
                 true
             }
             false
         }
 
         searchField.setOnFocusChangeListener {_, hasFocus ->
-            showNotFoundMessage(false)
-            showNoInternetConnectionMessage(false)
-            if (hasFocus && searchField.text.isEmpty() && searchHistory.isSearchHistoryNotEmpty()) {
-                showSearchHistory()
+
+            if (hasFocus && searchField.text.isEmpty()) {
+                showNotFoundMessage(false)
+                showNoInternetConnectionMessage(false)
+                savedInput = null
+
+                if (searchHistory.isSearchHistoryNotEmpty()) showSearchHistory()
+
             } else {
                 searchHistoryViewGroup.isVisible = false
             }
@@ -198,8 +205,8 @@ class SearchActivity : AppCompatActivity() {
         rvSearchHistory.adapter = searchAdapter
     }
 
-    private fun searchQuery() {
-        savedInput?.let {
+    private fun searchQuery(requestText: String?) {
+        requestText?.let {
                 showNotFoundMessage(false)
                 showNoInternetConnectionMessage(false)
                 iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
@@ -214,6 +221,7 @@ class SearchActivity : AppCompatActivity() {
                                     foundTracks.clear()
                                     foundTracks.addAll(response.body()?.results!!)
                                     searchAdapter.notifyDataSetChanged()
+
                                 } else {
                                     showNotFoundMessage(true)
                                     rvSearch.isVisible = false
