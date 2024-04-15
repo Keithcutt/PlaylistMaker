@@ -23,7 +23,7 @@ class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             .load(model.artworkUrl100)
             .centerCrop()
             .transform(RoundedCorners(dpToPx(2.toFloat(), itemView.context)))
-            .placeholder(R.drawable.ic_placeholder)
+            .placeholder(R.drawable.ic_placeholder_35x35)
             .into(cover)
 
         trackName.text = model.trackName
