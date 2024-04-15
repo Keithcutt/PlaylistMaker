@@ -12,7 +12,6 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.retrofit.ITunesApi
 import com.example.playlistmaker.retrofit.TrackResponse
@@ -28,7 +27,7 @@ class SearchActivity : AppCompatActivity() {
     private companion object {
         const val TEXT_INPUT = "TEXT_INPUT"
         const val TEXT_EMPTY = ""
-        const val SUCCESFUL_RESPONSE = 200
+        const val SUCCESSFUL_RESPONSE = 200
         const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
     }
 
@@ -200,7 +199,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun searchQuery(requestText: String?) {
-        if (requestText?.isBlank() == false) requestText?.let {
+        if (requestText?.isBlank() == false) requestText.let {
                 showNotFoundMessage(false)
                 showNoInternetConnectionMessage(false)
                 iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
@@ -209,7 +208,7 @@ class SearchActivity : AppCompatActivity() {
                         response: Response<TrackResponse>
                     ) {
                         when (response.code()) {
-                            SUCCESFUL_RESPONSE -> {
+                            SUCCESSFUL_RESPONSE -> {
                                 if (response.body()?.results?.isNotEmpty() == true) {
                                     rvSearch.isVisible = true
                                     foundTracks.clear()
