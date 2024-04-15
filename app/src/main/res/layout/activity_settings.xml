@@ -32,7 +32,7 @@
     </LinearLayout>
 
     <com.google.android.material.switchmaterial.SwitchMaterial
-        android:id="@+id/switch_theme"
+        android:id="@+id/theme_switcher"
         style="@style/GraySwitch"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

@@ -5,13 +5,13 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.retrofit.ITunesApi
 import com.example.playlistmaker.retrofit.TrackResponse
@@ -24,15 +24,27 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
-    private var savedInput: String? = null
+    private companion object {
+        const val TEXT_INPUT = "TEXT_INPUT"
+        const val TEXT_EMPTY = ""
+        const val SUCCESSFUL_RESPONSE = 200
+        const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
+    }
+
     private lateinit var notFoundPlaceholder: LinearLayout
     private lateinit var noInternetConnectionPlaceholder: LinearLayout
-    private lateinit var searchAdapter: SearchAdapter
     private lateinit var rvSearch: RecyclerView
     private lateinit var updateButton: MaterialButton
+    private lateinit var searchAdapter: SearchAdapter
+    private lateinit var clearButton: ImageView
+    private lateinit var searchField: EditText
 
-    private val foundTracks: MutableList<Track> = mutableListOf()
+    private lateinit var rvSearchHistory: RecyclerView
+    private lateinit var searchHistory: SearchHistory
+    private lateinit var searchHistoryViewGroup: LinearLayout
 
+    private var savedInput: String? = null
+    private var foundTracks: MutableList<Track> = mutableListOf()
 
     private val retrofit = Retrofit.Builder()
         .baseUrl("https://itunes.apple.com")
@@ -50,66 +62,88 @@ class SearchActivity : AppCompatActivity() {
             finish()
         }
 
-        val inputEditText = findViewById<EditText>(R.id.search_bar)
-        savedInstanceState ?: inputEditText.setText(savedInput)
-        val clearButton = findViewById<ImageView>(R.id.clear_icon)
-        clearButton.setOnClickListener {
-            inputEditText.setText("")
+        rvSearch = findViewById(R.id.rv_search)
+        createSearchAdapter()
 
-            foundTracks.clear()
-            searchAdapter.notifyDataSetChanged()
-            rvSearch.isVisible = false
-            showNotFoundMessage(false)
-            showNoInternetConnectionMessage(false)
+        notFoundPlaceholder = findViewById(R.id.placeholder_not_found)
+        noInternetConnectionPlaceholder = findViewById(R.id.placeholder_no_internet)
+        updateButton = findViewById(R.id.update_btn)
+        updateButton.setOnClickListener {
+            searchQuery(savedInput)
+        }
 
-
-            val inputMethodManager =
-                getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
+        createSearchHistoryHandler()
+        rvSearchHistory = findViewById(R.id.rv_search_history)
+        searchHistoryViewGroup = findViewById(R.id.search_history_viewgroup)
+        val clearHistoryButton = findViewById<MaterialButton>(R.id.clear_history_btn)
+        clearHistoryButton.setOnClickListener{
+            searchHistory.clear()
+            searchHistoryViewGroup.isVisible = false
         }
 
 
-        val searchBarWatcher = object : TextWatcher {
+        searchField = findViewById<EditText>(R.id.search_bar)
+        savedInstanceState ?: searchField.setText(savedInput)
+
+        clearButton = findViewById<ImageView>(R.id.clear_icon)
+        clearButton.setOnClickListener {
+            searchField.setText(TEXT_EMPTY)
+            rvSearch.isVisible = false
+            hideKeyboard(it)
+        }
+
+        val searchFieldWatcher = object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (!s.isNullOrEmpty()) {
                     savedInput = s.toString()
-
                 }
                 clearButton.isVisible = clearButtonVisibility(s)
+
+                if (searchField.hasFocus() && s?.isEmpty() == true) {
+                    showNoInternetConnectionMessage(false)
+                    showNotFoundMessage(false)
+                    savedInput = null
+
+                    if (searchHistory.isSearchHistoryNotEmpty()) showSearchHistory()
+
+                } else {
+                    searchHistoryViewGroup.isVisible = false
+                }
             }
 
             override fun afterTextChanged(s: Editable?) {}
         }
 
-        inputEditText.addTextChangedListener(searchBarWatcher)
+        searchField.addTextChangedListener(searchFieldWatcher)
 
-        rvSearch = findViewById<RecyclerView>(R.id.rv_search)
-        rvSearch.layoutManager = LinearLayoutManager(this, RecyclerView.VERTICAL, false)
-        searchAdapter = SearchAdapter(foundTracks)
-        rvSearch.adapter = searchAdapter
-
-
-
-
-
-        notFoundPlaceholder = findViewById(R.id.placeholder_not_found)
-        noInternetConnectionPlaceholder = findViewById(R.id.placeholder_no_internet)
-
-        inputEditText.setOnEditorActionListener {_, actionId, _ ->
+        searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                searchQuery()
+                searchQuery(savedInput)
                 true
             }
             false
         }
 
-        updateButton = findViewById(R.id.update_btn)
-        updateButton.setOnClickListener {
-            searchQuery()
+        searchField.setOnFocusChangeListener {_, hasFocus ->
+
+            if (hasFocus && searchField.text.isEmpty()) {
+                showNotFoundMessage(false)
+                showNoInternetConnectionMessage(false)
+                savedInput = null
+
+                if (searchHistory.isSearchHistoryNotEmpty()) showSearchHistory()
+
+            } else {
+                searchHistoryViewGroup.isVisible = false
+            }
         }
     }
+
+
+
+
 
     private fun clearButtonVisibility(s: CharSequence?): Boolean {
         return !s.isNullOrEmpty()
@@ -122,60 +156,83 @@ class SearchActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        savedInput = savedInstanceState.getString(TEXT_INPUT, TEXT_DEF)
+        savedInput = savedInstanceState.getString(TEXT_INPUT, null) //TEXT_EMPTY
     }
 
-    private companion object {
-        const val TEXT_INPUT = "TEXT_INPUT"
-        const val TEXT_DEF = ""
+    private fun hideKeyboard(view: View) {
+        val inputMethodManager =
+            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
-    private fun showNotFoundMessage(on: Boolean) {
-        notFoundPlaceholder.isVisible = on
+    private fun showNotFoundMessage(isTurnedOn: Boolean) {
+        notFoundPlaceholder.isVisible = isTurnedOn
         foundTracks.clear()
         searchAdapter.notifyDataSetChanged()
     }
 
-    private fun showNoInternetConnectionMessage(on: Boolean) {
-        noInternetConnectionPlaceholder.isVisible = on
+    private fun showNoInternetConnectionMessage(isTurnedOn: Boolean) {
+        noInternetConnectionPlaceholder.isVisible = isTurnedOn
         foundTracks.clear()
         searchAdapter.notifyDataSetChanged()
 
     }
 
-    private fun searchQuery() {
-        savedInput?.let {
-            showNotFoundMessage(false)
-            showNoInternetConnectionMessage(false)
-            iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    when (response.code()) {
-                        200 -> {
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                rvSearch.isVisible = true
-                                foundTracks.clear()
-                                foundTracks.addAll(response.body()?.results!!)
-                                searchAdapter.notifyDataSetChanged()
-                            } else {
-                                showNotFoundMessage(true)
+    private fun createSearchHistoryHandler() {
+        val sharedPreferences = getSharedPreferences(SEARCH_HISTORY_PREFERENCES, MODE_PRIVATE)
+        searchHistory = SearchHistory(sharedPreferences)
+    }
+
+    private fun createSearchAdapter() {
+        searchAdapter = SearchAdapter(foundTracks) {
+            searchHistory.save(it)
+        }
+    }
+
+    private fun showSearchHistory() {
+        searchHistoryViewGroup.isVisible = true
+        rvSearch.isVisible = false
+        foundTracks.clear()
+        foundTracks.addAll(searchHistory.getSearchHistory())
+        searchAdapter.notifyDataSetChanged()
+        rvSearchHistory.adapter = searchAdapter
+    }
+
+    private fun searchQuery(requestText: String?) {
+        if (requestText?.isBlank() == false) requestText.let {
+                showNotFoundMessage(false)
+                showNoInternetConnectionMessage(false)
+                iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
+                    override fun onResponse(
+                        call: Call<TrackResponse>,
+                        response: Response<TrackResponse>
+                    ) {
+                        when (response.code()) {
+                            SUCCESSFUL_RESPONSE -> {
+                                if (response.body()?.results?.isNotEmpty() == true) {
+                                    rvSearch.isVisible = true
+                                    foundTracks.clear()
+                                    foundTracks.addAll(response.body()?.results!!)
+                                    rvSearch.adapter = searchAdapter
+                                    searchAdapter.notifyDataSetChanged()
+
+                                } else {
+                                    showNotFoundMessage(true)
+                                    rvSearch.isVisible = false
+                                }
+                            }
+                            else -> {
+                                showNoInternetConnectionMessage(true)
                                 rvSearch.isVisible = false
                             }
                         }
-                        else -> {
-                            showNoInternetConnectionMessage(true)
-                            rvSearch.isVisible = false
-                        }
                     }
-                }
 
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    showNoInternetConnectionMessage(true)
-                    rvSearch.isVisible = false
-                }
-            })
+                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                        showNoInternetConnectionMessage(true)
+                        rvSearch.isVisible = false
+                    }
+                })
         }
     }
 }
