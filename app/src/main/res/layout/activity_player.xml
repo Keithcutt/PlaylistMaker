@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".PlayerActivity">
+    tools:context=".player.PlayerActivity">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/left_border"
@@ -105,7 +105,7 @@
         app:layout_constraintEnd_toStartOf="@id/right_border"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toEndOf="@id/album_title"
-        tools:text="Yesterday (Remastered 2009)" /> <!-- тут мб стоит проверить на обрезку -->
+        tools:text="Yesterday (Remastered 2009)" />
 
     <TextView
         android:id="@+id/duration_title"
@@ -138,57 +138,84 @@
         app:layout_constraintStart_toEndOf="@id/left_border"
         tools:text="0:30" />
 
-    <ImageButton
-        android:layout_width="@dimen/dp_52"
-        android:layout_height="@dimen/dp_52"
+    <ImageView
         android:id="@+id/add_to_playlist_button"
-        android:layout_marginBottom="@dimen/dp_28"
-        android:layout_marginStart="@dimen/dp_24"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/round_button"
-        android:alpha="0.25"
-        android:src="@drawable/ic_add"
-        app:layout_constraintEnd_toStartOf="@id/play_button"
-        app:layout_constraintBottom_toTopOf="@id/playback_progress"
-        /> <!-- разобраться с цветом -->
-    
-    <ImageButton
-        android:layout_width="@dimen/dp_100"
-        android:layout_height="@dimen/dp_100"
-        android:id="@+id/play_button"
-        android:src="@drawable/ic_play"
-        android:background="@android:color/transparent"
-        app:layout_constraintStart_toEndOf="@id/add_to_playlist_button"
-        app:layout_constraintEnd_toStartOf="@+id/add_to_favourite_button"
-        app:layout_constraintBottom_toTopOf="@id/playback_progress"
-        android:layout_marginBottom="@dimen/dp_4"
-         />
-    <!-- чекнуть бейслайн, разобраться с рамположением цепочки -->
-
-    <ImageButton
-        android:layout_width="@dimen/dp_52"
-        android:layout_height="@dimen/dp_52"
-        android:id="@+id/add_to_favourite_button"
-        android:layout_marginBottom="@dimen/dp_28"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="@dimen/dp_24"
-        android:background="@drawable/round_button"
-        android:alpha="0.25"
-        android:src="@drawable/ic_like"
-        app:layout_constraintStart_toEndOf="@id/play_button"
-        app:layout_constraintBottom_toTopOf="@id/playback_progress"
-        /> <!-- разобраться с цветом -->
-
-    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/dp_24"
+        app:layout_constraintEnd_toStartOf="@id/play_button"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        android:src="@drawable/button_add"
+        app:layout_constraintTop_toTopOf="@id/play_button"
+        app:layout_constraintBottom_toBottomOf="@id/play_button" />
+
+    <ImageView
+        android:id="@+id/play_button"
+        android:layout_width="@dimen/dp_100"
+        android:layout_height="@dimen/dp_100"
+        android:layout_marginBottom="@dimen/dp_4"
+        android:background="@android:color/transparent"
+        android:src="@drawable/ic_play"
+        app:layout_constraintBottom_toTopOf="@id/playback_progress"
+        app:layout_constraintEnd_toStartOf="@+id/add_to_favourite_button"
+        app:layout_constraintStart_toEndOf="@id/add_to_playlist_button" />
+
+    <ImageView
+        android:id="@+id/add_to_favourite_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/dp_24"
+        app:layout_constraintTop_toTopOf="@id/play_button"
+        app:layout_constraintBottom_toBottomOf="@id/play_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/play_button"
+        android:src="@drawable/button_like" />
+
+    <TextView
         android:id="@+id/artist_name"
-        tools:text="The Beatles"
+        style="@style/PlayerTrackAndArtist"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_24"
+        android:layout_marginBottom="@dimen/dp_32"
+        android:textSize="@dimen/sp_16"
+        app:layout_constraintBottom_toTopOf="@id/play_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="The Beatles" />
 
-        android:layout_marginBottom="@dimen/dp_32" />
+    <TextView
+        android:id="@+id/track_name"
+        style="@style/PlayerTrackAndArtist"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/dp_24"
+        android:layout_marginBottom="@dimen/dp_12"
+        android:textSize="@dimen/sp_22"
+        app:layout_constraintBottom_toTopOf="@id/artist_name"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:text="Yesterday (Remastered 2009)" />
 
+    <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:id="@+id/track_cover"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/dp_48"
+        android:layout_marginBottom="@dimen/dp_24"
+        app:layout_constraintBottom_toTopOf="@id/track_name"
+        app:layout_constraintDimensionRatio="1:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:src="@drawable/placeholder_237x234" />
 
-
-
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/back_button"
+        style="@style/HeaderBackButton"
+        android:layout_width="@dimen/dp_48"
+        android:layout_height="wrap_content"
+        app:icon="@drawable/ic_arrow_back"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

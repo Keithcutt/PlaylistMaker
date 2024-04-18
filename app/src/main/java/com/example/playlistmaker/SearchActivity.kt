@@ -1,6 +1,7 @@
 package com.example.playlistmaker
 
 import android.content.Context
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -13,9 +14,11 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.example.playlistmaker.player.PlayerActivity
 import com.example.playlistmaker.retrofit.ITunesApi
 import com.example.playlistmaker.retrofit.TrackResponse
 import com.google.android.material.button.MaterialButton
+import com.google.gson.Gson
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -29,6 +32,7 @@ class SearchActivity : AppCompatActivity() {
         const val TEXT_EMPTY = ""
         const val SUCCESSFUL_RESPONSE = 200
         const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
+        const val TRACK_KEY = "track"
     }
 
     private lateinit var notFoundPlaceholder: LinearLayout
@@ -183,9 +187,16 @@ class SearchActivity : AppCompatActivity() {
         searchHistory = SearchHistory(sharedPreferences)
     }
 
+    private fun startPlayerActivity(track: Track) {
+        val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+        playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
+        startActivity(playerIntent)
+    }
+
     private fun createSearchAdapter() {
         searchAdapter = SearchAdapter(foundTracks) {
             searchHistory.save(it)
+            startPlayerActivity(it)
         }
     }
 

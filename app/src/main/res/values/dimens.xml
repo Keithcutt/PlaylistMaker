@@ -21,7 +21,7 @@
 
     <dimen name="sp_12">12sp</dimen>
     <dimen name="sp_16">16sp</dimen>
-    <dimen name="heading_text">22sp</dimen>
+    <dimen name="sp_22">22sp</dimen>
     <dimen name="sp_20">20sp</dimen>
 
 </resources>
