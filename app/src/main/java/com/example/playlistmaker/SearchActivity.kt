@@ -37,6 +37,7 @@ class SearchActivity : AppCompatActivity() {
         const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
         const val TRACK_KEY = "track"
         const val SEARCH_DEBOUNCE_DELAY = 2000L
+        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     private lateinit var notFoundPlaceholder: LinearLayout
@@ -64,6 +65,7 @@ class SearchActivity : AppCompatActivity() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchQuery(savedInput) }
+    private var isClickAllowed = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -200,9 +202,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun startPlayerActivity(track: Track) {
-        val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
-        playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
-        startActivity(playerIntent)
+        if (clickDebounce()) {
+            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+            playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
+            startActivity(playerIntent)
+        }
     }
 
     private fun createSearchAdapter() {
@@ -268,5 +272,14 @@ class SearchActivity : AppCompatActivity() {
     private fun searchDebounce() {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed( { isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
 }
