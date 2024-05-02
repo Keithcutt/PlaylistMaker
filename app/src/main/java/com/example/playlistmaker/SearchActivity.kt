@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.player.PlayerActivity
@@ -45,6 +46,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var clearButton: ImageView
     private lateinit var searchField: EditText
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var rvSearchHistory: RecyclerView
     private lateinit var searchHistory: SearchHistory
@@ -111,7 +113,7 @@ class SearchActivity : AppCompatActivity() {
                 }
                 clearButton.isVisible = clearButtonVisibility(s)
 
-                searchDebounce() //?
+                searchDebounce()
 
                 if (searchField.hasFocus() && s?.isEmpty() == true) {
                     showNoInternetConnectionMessage(false)
@@ -151,6 +153,8 @@ class SearchActivity : AppCompatActivity() {
                 searchHistoryViewGroup.isVisible = false
             }
         }
+
+        progressBar = findViewById(R.id.progress_bar)
     }
 
 
@@ -219,39 +223,45 @@ class SearchActivity : AppCompatActivity() {
 
     private fun searchQuery(requestText: String?) {
         if (requestText?.isBlank() == false) requestText.let {
-                showNotFoundMessage(false)
-                showNoInternetConnectionMessage(false)
-                iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
-                    override fun onResponse(
-                        call: Call<TrackResponse>,
-                        response: Response<TrackResponse>
-                    ) {
-                        when (response.code()) {
-                            SUCCESSFUL_RESPONSE -> {
-                                if (response.body()?.results?.isNotEmpty() == true) {
-                                    rvSearch.isVisible = true
-                                    foundTracks.clear()
-                                    foundTracks.addAll(response.body()?.results!!)
-                                    rvSearch.adapter = searchAdapter
-                                    searchAdapter.notifyDataSetChanged()
+            showNotFoundMessage(false)
+            showNoInternetConnectionMessage(false)
+            rvSearch.isVisible = false
+            progressBar.isVisible = true
 
-                                } else {
-                                    showNotFoundMessage(true)
-                                    rvSearch.isVisible = false
-                                }
-                            }
-                            else -> {
-                                showNoInternetConnectionMessage(true)
+            iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
+                override fun onResponse(
+                    call: Call<TrackResponse>,
+                    response: Response<TrackResponse>
+                ) {
+                    progressBar.isVisible = false
+                    when (response.code()) {
+                        SUCCESSFUL_RESPONSE -> {
+                            if (response.body()?.results?.isNotEmpty() == true) {
+                                rvSearch.isVisible = true
+                                foundTracks.clear()
+                                foundTracks.addAll(response.body()?.results!!)
+                                rvSearch.adapter = searchAdapter
+                                searchAdapter.notifyDataSetChanged()
+
+                            } else {
+                                showNotFoundMessage(true)
                                 rvSearch.isVisible = false
                             }
                         }
+                        else -> {
+                            showNoInternetConnectionMessage(true)
+                            rvSearch.isVisible = false
+                            progressBar.isVisible = false
+                        }
                     }
+                }
 
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        showNoInternetConnectionMessage(true)
-                        rvSearch.isVisible = false
-                    }
-                })
+                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                    showNoInternetConnectionMessage(true)
+                    rvSearch.isVisible = false
+                    progressBar.isVisible = false
+                }
+            })
         }
     }
 

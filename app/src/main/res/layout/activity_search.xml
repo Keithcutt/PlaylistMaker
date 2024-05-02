@@ -73,8 +73,8 @@
         android:layout_height="match_parent"
         android:layout_marginTop="@dimen/dp_16"
         android:visibility="gone"
-        tools:listitem="@layout/track_item"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/track_item" />
 
     <LinearLayout
         android:id="@+id/placeholder_not_found"
@@ -165,4 +165,13 @@
             android:text="@string/clear_history"
             app:cornerRadius="@dimen/dp_52" />
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="@dimen/dp_45"
+        android:layout_height="@dimen/dp_45"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/dp_140"
+        android:indeterminateTint="@color/YP_blue"
+        android:visibility="gone" />
 </LinearLayout>
