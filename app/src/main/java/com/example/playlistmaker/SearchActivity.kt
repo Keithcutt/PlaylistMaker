@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -33,6 +35,7 @@ class SearchActivity : AppCompatActivity() {
         const val SUCCESSFUL_RESPONSE = 200
         const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
         const val TRACK_KEY = "track"
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
 
     private lateinit var notFoundPlaceholder: LinearLayout
@@ -56,6 +59,9 @@ class SearchActivity : AppCompatActivity() {
         .build()
 
     private val iTunesApiService = retrofit.create(ITunesApi::class.java)
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { searchQuery(savedInput) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -105,13 +111,15 @@ class SearchActivity : AppCompatActivity() {
                 }
                 clearButton.isVisible = clearButtonVisibility(s)
 
+                searchDebounce() //?
+
                 if (searchField.hasFocus() && s?.isEmpty() == true) {
                     showNoInternetConnectionMessage(false)
                     showNotFoundMessage(false)
                     savedInput = null
 
-                    if (searchHistory.isSearchHistoryNotEmpty()) showSearchHistory()
-
+                    if (searchHistory.isSearchHistoryNotEmpty())
+                        showSearchHistory()
                 } else {
                     searchHistoryViewGroup.isVisible = false
                 }
@@ -245,5 +253,10 @@ class SearchActivity : AppCompatActivity() {
                     }
                 })
         }
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 }
