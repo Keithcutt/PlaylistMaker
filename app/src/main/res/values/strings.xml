@@ -28,4 +28,6 @@
     <string name="genre">Жанр</string>
     <string name="country">Страна</string>
 
+    <string name="zeroZero">00:00</string>
+
 </resources>

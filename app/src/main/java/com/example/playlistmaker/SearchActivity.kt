@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -12,6 +14,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.player.PlayerActivity
@@ -33,6 +36,8 @@ class SearchActivity : AppCompatActivity() {
         const val SUCCESSFUL_RESPONSE = 200
         const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
         const val TRACK_KEY = "track"
+        const val SEARCH_DEBOUNCE_DELAY = 2000L
+        const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
     private lateinit var notFoundPlaceholder: LinearLayout
@@ -42,6 +47,7 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchAdapter: SearchAdapter
     private lateinit var clearButton: ImageView
     private lateinit var searchField: EditText
+    private lateinit var progressBar: ProgressBar
 
     private lateinit var rvSearchHistory: RecyclerView
     private lateinit var searchHistory: SearchHistory
@@ -56,6 +62,10 @@ class SearchActivity : AppCompatActivity() {
         .build()
 
     private val iTunesApiService = retrofit.create(ITunesApi::class.java)
+
+    private val handler = Handler(Looper.getMainLooper())
+    private val searchRunnable = Runnable { searchQuery(savedInput) }
+    private var isClickAllowed = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +104,7 @@ class SearchActivity : AppCompatActivity() {
             searchField.setText(TEXT_EMPTY)
             rvSearch.isVisible = false
             hideKeyboard(it)
+            searchDebounce()
         }
 
         val searchFieldWatcher = object : TextWatcher {
@@ -104,14 +115,15 @@ class SearchActivity : AppCompatActivity() {
                     savedInput = s.toString()
                 }
                 clearButton.isVisible = clearButtonVisibility(s)
+                searchDebounce()
 
                 if (searchField.hasFocus() && s?.isEmpty() == true) {
                     showNoInternetConnectionMessage(false)
                     showNotFoundMessage(false)
                     savedInput = null
 
-                    if (searchHistory.isSearchHistoryNotEmpty()) showSearchHistory()
-
+                    if (searchHistory.isSearchHistoryNotEmpty())
+                        showSearchHistory()
                 } else {
                     searchHistoryViewGroup.isVisible = false
                 }
@@ -125,6 +137,7 @@ class SearchActivity : AppCompatActivity() {
         searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 searchQuery(savedInput)
+                handler.removeCallbacks(searchRunnable)
                 true
             }
             false
@@ -143,9 +156,14 @@ class SearchActivity : AppCompatActivity() {
                 searchHistoryViewGroup.isVisible = false
             }
         }
+
+        progressBar = findViewById(R.id.progress_bar)
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(searchRunnable)
+    }
 
 
 
@@ -188,9 +206,11 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun startPlayerActivity(track: Track) {
-        val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
-        playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
-        startActivity(playerIntent)
+        if (clickDebounce()) {
+            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+            playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
+            startActivity(playerIntent)
+        }
     }
 
     private fun createSearchAdapter() {
@@ -211,39 +231,59 @@ class SearchActivity : AppCompatActivity() {
 
     private fun searchQuery(requestText: String?) {
         if (requestText?.isBlank() == false) requestText.let {
-                showNotFoundMessage(false)
-                showNoInternetConnectionMessage(false)
-                iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
-                    override fun onResponse(
-                        call: Call<TrackResponse>,
-                        response: Response<TrackResponse>
-                    ) {
-                        when (response.code()) {
-                            SUCCESSFUL_RESPONSE -> {
-                                if (response.body()?.results?.isNotEmpty() == true) {
-                                    rvSearch.isVisible = true
-                                    foundTracks.clear()
-                                    foundTracks.addAll(response.body()?.results!!)
-                                    rvSearch.adapter = searchAdapter
-                                    searchAdapter.notifyDataSetChanged()
+            showNotFoundMessage(false)
+            showNoInternetConnectionMessage(false)
+            rvSearch.isVisible = false
+            progressBar.isVisible = true
 
-                                } else {
-                                    showNotFoundMessage(true)
-                                    rvSearch.isVisible = false
-                                }
-                            }
-                            else -> {
-                                showNoInternetConnectionMessage(true)
+            iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
+                override fun onResponse(
+                    call: Call<TrackResponse>,
+                    response: Response<TrackResponse>
+                ) {
+                    progressBar.isVisible = false
+                    when (response.code()) {
+                        SUCCESSFUL_RESPONSE -> {
+                            if (response.body()?.results?.isNotEmpty() == true) {
+                                rvSearch.isVisible = true
+                                foundTracks.clear()
+                                foundTracks.addAll(response.body()?.results!!)
+                                rvSearch.adapter = searchAdapter
+                                searchAdapter.notifyDataSetChanged()
+
+                            } else {
+                                showNotFoundMessage(true)
                                 rvSearch.isVisible = false
                             }
                         }
+                        else -> {
+                            showNoInternetConnectionMessage(true)
+                            rvSearch.isVisible = false
+                            progressBar.isVisible = false
+                        }
                     }
+                }
 
-                    override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                        showNoInternetConnectionMessage(true)
-                        rvSearch.isVisible = false
-                    }
-                })
+                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
+                    showNoInternetConnectionMessage(true)
+                    rvSearch.isVisible = false
+                    progressBar.isVisible = false
+                }
+            })
         }
+    }
+
+    private fun searchDebounce() {
+        handler.removeCallbacks(searchRunnable)
+        handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
+    }
+
+    private fun clickDebounce(): Boolean {
+        val current = isClickAllowed
+        if (isClickAllowed) {
+            isClickAllowed = false
+            handler.postDelayed( { isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+        }
+        return current
     }
 }
