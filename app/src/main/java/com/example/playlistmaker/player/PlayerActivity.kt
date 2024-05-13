@@ -7,13 +7,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.TypedValue
-import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.Track
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -31,6 +29,7 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private lateinit var binding: ActivityPlayerBinding
+    private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
 
     private var playerState = STATE_DEFAULT
     private var mediaPlayer = MediaPlayer()
@@ -74,7 +73,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.countryValue.text = model.country
         binding.yearValue.text = model.releaseDate.substringBefore("-")
         binding.albumValue.text = model.collectionName
-        binding.durationValue.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime)
+        binding.durationValue.text = dateFormat.format(model.trackTime)
 
         Glide.with(this@PlayerActivity)
             .load(model.getCoverArtwork())
@@ -134,7 +133,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun playbackProgressCounter() {
         if (playerState == STATE_PLAYING) {
-            binding.playbackProgress.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(mediaPlayer.currentPosition)
+            binding.playbackProgress.text = dateFormat.format(mediaPlayer.currentPosition)
             handler.postDelayed(playbackRunnable, 300)
         }
     }

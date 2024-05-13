@@ -104,6 +104,7 @@ class SearchActivity : AppCompatActivity() {
             searchField.setText(TEXT_EMPTY)
             rvSearch.isVisible = false
             hideKeyboard(it)
+            searchDebounce()
         }
 
         val searchFieldWatcher = object : TextWatcher {
@@ -114,7 +115,6 @@ class SearchActivity : AppCompatActivity() {
                     savedInput = s.toString()
                 }
                 clearButton.isVisible = clearButtonVisibility(s)
-
                 searchDebounce()
 
                 if (searchField.hasFocus() && s?.isEmpty() == true) {
@@ -160,7 +160,10 @@ class SearchActivity : AppCompatActivity() {
         progressBar = findViewById(R.id.progress_bar)
     }
 
-
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacksAndMessages(searchRunnable)
+    }
 
 
 
