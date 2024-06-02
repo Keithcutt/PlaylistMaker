@@ -1,4 +1,4 @@
-package com.example.playlistmaker.player
+package com.example.playlistmaker.ui.player
 
 import android.content.Context
 import android.media.MediaPlayer
@@ -10,8 +10,8 @@ import android.util.TypedValue
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.Track
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -22,17 +22,17 @@ class PlayerActivity : AppCompatActivity() {
         const val TRACK_KEY = "track"
         const val ARTWORK_CORNER_RADIUS = 8
 
-        const val STATE_DEFAULT = 0
-        const val STATE_PREPARED = 1
-        const val STATE_PLAYING = 2
-        const val STATE_PAUSED = 3
+//        const val STATE_DEFAULT = 0
+//        const val STATE_PREPARED = 1
+//        const val STATE_PLAYING = 2
+//        const val STATE_PAUSED = 3
     }
 
     private lateinit var binding: ActivityPlayerBinding
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
 
-    private var playerState = STATE_DEFAULT
-    private var mediaPlayer = MediaPlayer()
+//    private var playerState = STATE_DEFAULT
+//    private var mediaPlayer = MediaPlayer()
 
     private val handler = Handler(Looper.getMainLooper())
     private val playbackRunnable = { playbackProgressCounter() }
@@ -41,12 +41,12 @@ class PlayerActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         val json = intent.getStringExtra(TRACK_KEY)
         val currentTrack = Gson().fromJson(json, Track::class.java)
         bindData(currentTrack)
 
         binding.backButton.setOnClickListener { finish() }
-
         preparePlayer(currentTrack.previewUrl)
         binding.playButton.setOnClickListener {
             playbackControl()
