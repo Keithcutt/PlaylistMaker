@@ -1,11 +1,13 @@
 package com.example.playlistmaker.data.repository
 
 import android.media.MediaPlayer
+import com.example.playlistmaker.domain.api.OnPlayerStateChangeListener
+import com.example.playlistmaker.domain.models.PlayerState
 import com.example.playlistmaker.domain.repository.PlayerRepository
 
 class PlayerRepositoryImpl : PlayerRepository {
 
-    private var playerState = STATE_DEFAULT
+    private var playerState = PlayerState.DEFAULT
     private var mediaPlayer = MediaPlayer()
 
     // Нужно подготовить плеер, т.е. передать в него URL нужного трека
@@ -14,12 +16,14 @@ class PlayerRepositoryImpl : PlayerRepository {
         mediaPlayer.prepareAsync()
 
         mediaPlayer.setOnPreparedListener {
-            playerState = STATE_PREPARED
+            playerState = PlayerState.PREPARED
+
             // binding.playButton.isEnabled = true
+
         }
 
         mediaPlayer.setOnCompletionListener {
-            playerState = STATE_PREPARED
+            playerState = PlayerState.PREPARED
             // binding.playButton.setImageResource(R.drawable.btn_play)
             // handler.removeCallbacks(playbackRunnable)
             // binding.playbackProgress.text = getString(R.string.zeroZero)
@@ -28,14 +32,14 @@ class PlayerRepositoryImpl : PlayerRepository {
 
     override fun startPlayer() {
         mediaPlayer.start()
-        playerState = STATE_PLAYING
+        playerState = PlayerState.PLAYING
         // binding.playButton.setImageResource(R.drawable.btn_pause)
         // playbackProgressCounter()
     }
 
     override fun pausePlayer() {
         mediaPlayer.pause()
-        playerState = STATE_PAUSED
+        playerState = PlayerState.PAUSED
         // handler.removeCallbacks(playbackRunnable)
         // binding.playButton.setImageResource(R.drawable.btn_play)
     }
@@ -46,19 +50,21 @@ class PlayerRepositoryImpl : PlayerRepository {
 
     override fun playbackControl() {
         when(playerState) {
-            STATE_PLAYING -> {
+            PlayerState.PLAYING -> {
                 pausePlayer()
             }
-            STATE_PREPARED, STATE_PAUSED -> {
+            PlayerState.PREPARED, PlayerState.PAUSED -> {
                 startPlayer()
             }
+            else -> {}
         }
     }
 
-    companion object {
-        private const val STATE_DEFAULT = 0
-        private const val STATE_PREPARED = 1
-        private const val STATE_PLAYING = 2
-        private const val STATE_PAUSED = 3
+    override fun getCurrentPosition() : Int {
+        return mediaPlayer.currentPosition
+    }
+
+    override fun setOnPlayerStateChangeListener(onStateChangeListener: OnPlayerStateChangeListener) {
+
     }
 }
