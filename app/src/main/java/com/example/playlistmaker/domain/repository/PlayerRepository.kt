@@ -8,6 +8,6 @@ interface PlayerRepository {
     fun pausePlayer()
     fun releasePlayer()
     fun playbackControl()
-    fun setOnPlayerStateChangeListener(onStateChangeListener: OnPlayerStateChangeListener) : OnPlayerStateChangeListener
+    fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener)
     fun getCurrentPosition() : Int
 }

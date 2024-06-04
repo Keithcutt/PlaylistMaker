@@ -98,17 +98,6 @@ class PlayerActivity : AppCompatActivity() {
                 }
             })
         }
-//    private fun playbackControl() {
-//        when(playerState) {
-//            STATE_PLAYING -> {
-//                pausePlayer()
-//            }
-//            STATE_PREPARED, STATE_PAUSED -> {
-//                startPlayer()
-//            }
-//        }
-//    }
-
     }
 
     override fun onPause() {

@@ -9,7 +9,7 @@ class PlayerRepositoryImpl() : PlayerRepository {
 
     private var playerState = PlayerState.DEFAULT
     private var mediaPlayer = MediaPlayer()
-    private val onStateChangeListener = setOnPlayerStateChangeListener(onStateChangeListener)
+    private lateinit var onStateChangeListener : OnPlayerStateChangeListener
 
     // Нужно подготовить плеер, т.е. передать в него URL нужного трека
     override fun preparePlayer(url: String) {
@@ -27,9 +27,11 @@ class PlayerRepositoryImpl() : PlayerRepository {
 
         mediaPlayer.setOnCompletionListener {
             playerState = PlayerState.PREPARED
+
             // binding.playButton.setImageResource(R.drawable.btn_play)
             // handler.removeCallbacks(playbackRunnable)
             // binding.playbackProgress.text = getString(R.string.zeroZero)
+            onStateChangeListener.onChange(playerState)
         }
     }
 
@@ -38,6 +40,7 @@ class PlayerRepositoryImpl() : PlayerRepository {
         playerState = PlayerState.PLAYING
         // binding.playButton.setImageResource(R.drawable.btn_pause)
         // playbackProgressCounter()
+        onStateChangeListener.onChange(playerState)
 
     }
 
@@ -47,6 +50,7 @@ class PlayerRepositoryImpl() : PlayerRepository {
 
         // handler.removeCallbacks(playbackRunnable)
         // binding.playButton.setImageResource(R.drawable.btn_play)
+        onStateChangeListener.onChange(playerState)
     }
 
     override fun releasePlayer() {
@@ -70,7 +74,7 @@ class PlayerRepositoryImpl() : PlayerRepository {
         return mediaPlayer.currentPosition
     }
 
-    override fun setOnPlayerStateChangeListener(onStateChangeListener: OnPlayerStateChangeListener) : OnPlayerStateChangeListener {
-        return onStateChangeListener
+    override fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener) {
+        onStateChangeListener = listener
     }
 }

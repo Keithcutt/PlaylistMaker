@@ -8,6 +8,6 @@ interface PlayerInteractor {
     fun pausePlayer()
     fun releasePlayer()
     fun playbackControl()
-    fun setOnPlayerStateChangeListener(onStateChangeListener: OnPlayerStateChangeListener)
+    fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener)
     fun getCurrentPosition() : Int
 }

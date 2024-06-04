@@ -30,8 +30,8 @@ class PlayerInteractorImpl(
          playerRepository.playbackControl()
     }
 
-    override fun setOnPlayerStateChangeListener(onStateChangeListener: OnPlayerStateChangeListener) {
-        playerRepository.setOnPlayerStateChangeListener(onStateChangeListener)
+    override fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener) {
+        playerRepository.setOnPlayerStateChangeListener(listener)
     }
 
     override fun getCurrentPosition(): Int {
