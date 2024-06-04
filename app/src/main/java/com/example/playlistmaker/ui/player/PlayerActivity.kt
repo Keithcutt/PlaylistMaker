@@ -51,36 +51,63 @@ class PlayerActivity : AppCompatActivity() {
 
         binding.backButton.setOnClickListener { finish() }
         // preparePlayer(currentTrack.previewUrl)
-        playerInteractor.preparePlayer(currentTrack.previewUrl)
+
         binding.playButton.setOnClickListener {
             // playbackControl()
             playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
                 override fun onChange(state: PlayerState) {
                     when (state) {
-                        PlayerState.PREPARED -> {
-                            binding.playButton.isEnabled = true
-                            binding.playButton.setImageResource(R.drawable.btn_play)
-
-                            handler.removeCallbacks(playbackRunnable)
-                            binding.playbackProgress.text = getString(R.string.zeroZero)
-                        }
+//                        PlayerState.PREPARED -> {
+//                            binding.playButton.isEnabled = true
+//                            binding.playButton.setImageResource(R.drawable.btn_play)
+//
+//                            handler.removeCallbacks(playbackRunnable)
+//                            binding.playbackProgress.text = getString(R.string.zeroZero)
+//                        }
+//                        PlayerState.PLAYING -> {
+//                            playerInteractor.startPlayer()
+//                            binding.playButton.setImageResource(R.drawable.btn_pause)
+//                            playbackProgressCounter()
+//                        }
+//                        PlayerState.PAUSED -> {
+//                            playerInteractor.pausePlayer()
+//                            binding.playButton.setImageResource(R.drawable.btn_play)
+//                            handler.removeCallbacks(playbackRunnable)
+//                        }
+//
+//                        else -> {}
                         PlayerState.PLAYING -> {
-                            playerInteractor.startPlayer()
-                            binding.playButton.setImageResource(R.drawable.btn_pause)
-                            playbackProgressCounter()
-                        }
-                        PlayerState.PAUSED -> {
                             playerInteractor.pausePlayer()
                             binding.playButton.setImageResource(R.drawable.btn_play)
                             handler.removeCallbacks(playbackRunnable)
                         }
+                        PlayerState.PREPARED, PlayerState.PAUSED -> {
+                            playerInteractor.startPlayer()
+                            binding.playButton.setImageResource(R.drawable.btn_pause)
+                            playbackProgressCounter()
+                        }
+                        PlayerState.DEFAULT -> {
+                            playerInteractor.preparePlayer(currentTrack.previewUrl)
+                            binding.playButton.isEnabled = true
 
-                        else -> {}
+                            handler.removeCallbacks(playbackRunnable)
+                            binding.playbackProgress.text = getString(R.string.zeroZero)
+                        }
+
                     }
                 }
             })
         }
-
+//    private fun playbackControl() {
+//        when(playerState) {
+//            STATE_PLAYING -> {
+//                pausePlayer()
+//            }
+//            STATE_PREPARED, STATE_PAUSED -> {
+//                startPlayer()
+//            }
+//        }
+//    }
 
     }
 

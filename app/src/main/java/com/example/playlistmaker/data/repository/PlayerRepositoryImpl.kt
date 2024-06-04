@@ -5,10 +5,11 @@ import com.example.playlistmaker.domain.api.OnPlayerStateChangeListener
 import com.example.playlistmaker.domain.models.PlayerState
 import com.example.playlistmaker.domain.repository.PlayerRepository
 
-class PlayerRepositoryImpl : PlayerRepository {
+class PlayerRepositoryImpl() : PlayerRepository {
 
     private var playerState = PlayerState.DEFAULT
     private var mediaPlayer = MediaPlayer()
+    private val onStateChangeListener = setOnPlayerStateChangeListener(onStateChangeListener)
 
     // Нужно подготовить плеер, т.е. передать в него URL нужного трека
     override fun preparePlayer(url: String) {
@@ -17,6 +18,8 @@ class PlayerRepositoryImpl : PlayerRepository {
 
         mediaPlayer.setOnPreparedListener {
             playerState = PlayerState.PREPARED
+            //вызвать слушатель
+            onStateChangeListener.onChange(playerState)
 
             // binding.playButton.isEnabled = true
 
@@ -35,11 +38,13 @@ class PlayerRepositoryImpl : PlayerRepository {
         playerState = PlayerState.PLAYING
         // binding.playButton.setImageResource(R.drawable.btn_pause)
         // playbackProgressCounter()
+
     }
 
     override fun pausePlayer() {
         mediaPlayer.pause()
         playerState = PlayerState.PAUSED
+
         // handler.removeCallbacks(playbackRunnable)
         // binding.playButton.setImageResource(R.drawable.btn_play)
     }
@@ -52,6 +57,7 @@ class PlayerRepositoryImpl : PlayerRepository {
         when(playerState) {
             PlayerState.PLAYING -> {
                 pausePlayer()
+
             }
             PlayerState.PREPARED, PlayerState.PAUSED -> {
                 startPlayer()
@@ -64,7 +70,7 @@ class PlayerRepositoryImpl : PlayerRepository {
         return mediaPlayer.currentPosition
     }
 
-    override fun setOnPlayerStateChangeListener(onStateChangeListener: OnPlayerStateChangeListener) {
-
+    override fun setOnPlayerStateChangeListener(onStateChangeListener: OnPlayerStateChangeListener) : OnPlayerStateChangeListener {
+        return onStateChangeListener
     }
 }
