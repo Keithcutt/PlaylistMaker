@@ -10,8 +10,12 @@ class PlayerInteractorImpl(
 ) : PlayerInteractor {
 
     // Здесь просто выполняем те методы которые есть в репозитории
-    override fun preparePlayer(url: String) {
-        playerRepository.preparePlayer(url)
+    override fun setUrl(url: String) {
+        playerRepository.setUrl(url)
+    }
+
+    override fun preparePlayer() {
+        playerRepository.preparePlayer()
     }
 
     override fun startPlayer() {
@@ -26,9 +30,9 @@ class PlayerInteractorImpl(
         playerRepository.releasePlayer()
     }
 
-     override fun playbackControl() {
-         playerRepository.playbackControl()
-    }
+//     override fun playbackControl() {
+//         playerRepository.playbackControl()
+//    }
 
     override fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener) {
         playerRepository.setOnPlayerStateChangeListener(listener)

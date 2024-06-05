@@ -8,67 +8,74 @@ import com.example.playlistmaker.domain.repository.PlayerRepository
 class PlayerRepositoryImpl() : PlayerRepository {
 
     private var playerState = PlayerState.DEFAULT
+    private lateinit var mediaPlayerUrl: String
     private var mediaPlayer = MediaPlayer()
     private lateinit var onStateChangeListener : OnPlayerStateChangeListener
 
     // Нужно подготовить плеер, т.е. передать в него URL нужного трека
-    override fun preparePlayer(url: String) {
+    override fun setUrl(url: String) {
+        mediaPlayerUrl = url
+
+    }
+
+    override fun preparePlayer() {
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
-
         mediaPlayer.setOnPreparedListener {
-            playerState = PlayerState.PREPARED
+            // playerState = PlayerState.PREPARED
             //вызвать слушатель
-            onStateChangeListener.onChange(playerState)
+            onStateChangeListener.onChange(PlayerState.PREPARED)
 
             // binding.playButton.isEnabled = true
 
         }
 
         mediaPlayer.setOnCompletionListener {
-            playerState = PlayerState.PREPARED
+            // playerState = PlayerState.PREPARED
 
             // binding.playButton.setImageResource(R.drawable.btn_play)
             // handler.removeCallbacks(playbackRunnable)
             // binding.playbackProgress.text = getString(R.string.zeroZero)
-            onStateChangeListener.onChange(playerState)
+            onStateChangeListener.onChange(PlayerState.PREPARED)
         }
     }
 
     override fun startPlayer() {
         mediaPlayer.start()
-        playerState = PlayerState.PLAYING
+        // playerState = PlayerState.PLAYING
+
+
         // binding.playButton.setImageResource(R.drawable.btn_pause)
         // playbackProgressCounter()
-        onStateChangeListener.onChange(playerState)
+        onStateChangeListener.onChange(PlayerState.PLAYING)
 
     }
 
     override fun pausePlayer() {
         mediaPlayer.pause()
-        playerState = PlayerState.PAUSED
+        // playerState = PlayerState.PAUSED
 
         // handler.removeCallbacks(playbackRunnable)
         // binding.playButton.setImageResource(R.drawable.btn_play)
-        onStateChangeListener.onChange(playerState)
+        onStateChangeListener.onChange(PlayerState.PAUSED)
     }
 
     override fun releasePlayer() {
         mediaPlayer.release()
     }
 
-    override fun playbackControl() {
-        when(playerState) {
-            PlayerState.PLAYING -> {
-                pausePlayer()
-
-            }
-            PlayerState.PREPARED, PlayerState.PAUSED -> {
-                startPlayer()
-            }
-            else -> {}
-        }
-    }
+//    override fun playbackControl() {
+//        when(playerState) {
+//            PlayerState.PLAYING -> {
+//                pausePlayer()
+//
+//            }
+//            PlayerState.PREPARED, PlayerState.PAUSED -> {
+//                startPlayer()
+//            }
+//            else -> {}
+//        }
+//    }
 
     override fun getCurrentPosition() : Int {
         return mediaPlayer.currentPosition

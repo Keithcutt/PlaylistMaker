@@ -23,18 +23,11 @@ class PlayerActivity : AppCompatActivity() {
     private companion object {
         const val TRACK_KEY = "track"
         const val ARTWORK_CORNER_RADIUS = 8
-
-//        const val STATE_DEFAULT = 0
-//        const val STATE_PREPARED = 1
-//        const val STATE_PLAYING = 2
-//        const val STATE_PAUSED = 3
     }
 
     private lateinit var binding: ActivityPlayerBinding
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
-
-//    private var playerState = STATE_DEFAULT
-//    private var mediaPlayer = MediaPlayer()
+    // private lateinit var currentTrack: Track
 
     private val handler = Handler(Looper.getMainLooper())
     private val playbackRunnable = { playbackProgressCounter() }
@@ -46,55 +39,18 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // val
         val currentTrack = getCurrentTrack()
         bindData(currentTrack)
 
         binding.backButton.setOnClickListener { finish() }
-        // preparePlayer(currentTrack.previewUrl)
 
+        // Сначала нужно подготовить плеер, и тут уже требуется передавать слушатель
+        playerInteractor.setUrl(currentTrack.previewUrl)
         binding.playButton.setOnClickListener {
-            // playbackControl()
             playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
                 override fun onChange(state: PlayerState) {
-                    when (state) {
-//                        PlayerState.PREPARED -> {
-//                            binding.playButton.isEnabled = true
-//                            binding.playButton.setImageResource(R.drawable.btn_play)
-//
-//                            handler.removeCallbacks(playbackRunnable)
-//                            binding.playbackProgress.text = getString(R.string.zeroZero)
-//                        }
-//                        PlayerState.PLAYING -> {
-//                            playerInteractor.startPlayer()
-//                            binding.playButton.setImageResource(R.drawable.btn_pause)
-//                            playbackProgressCounter()
-//                        }
-//                        PlayerState.PAUSED -> {
-//                            playerInteractor.pausePlayer()
-//                            binding.playButton.setImageResource(R.drawable.btn_play)
-//                            handler.removeCallbacks(playbackRunnable)
-//                        }
-//
-//                        else -> {}
-                        PlayerState.PLAYING -> {
-                            playerInteractor.pausePlayer()
-                            binding.playButton.setImageResource(R.drawable.btn_play)
-                            handler.removeCallbacks(playbackRunnable)
-                        }
-                        PlayerState.PREPARED, PlayerState.PAUSED -> {
-                            playerInteractor.startPlayer()
-                            binding.playButton.setImageResource(R.drawable.btn_pause)
-                            playbackProgressCounter()
-                        }
-                        PlayerState.DEFAULT -> {
-                            playerInteractor.preparePlayer(currentTrack.previewUrl)
-                            binding.playButton.isEnabled = true
-
-                            handler.removeCallbacks(playbackRunnable)
-                            binding.playbackProgress.text = getString(R.string.zeroZero)
-                        }
-
-                    }
+                    playbackControl(state)
                 }
             })
         }
@@ -102,13 +58,11 @@ class PlayerActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        // pausePlayer()
         playerInteractor.pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // mediaPlayer.release()
         playerInteractor.releasePlayer()
 
         handler.removeCallbacks(playbackRunnable)
@@ -144,51 +98,40 @@ class PlayerActivity : AppCompatActivity() {
             context.resources.displayMetrics).toInt()
     }
 
-//    private fun preparePlayer(url: String) {
-        // mediaPlayer.setDataSource(url)
-        // mediaPlayer.prepareAsync()
-//        mediaPlayer.setOnPreparedListener {
-//            binding.playButton.isEnabled = true
-//            playerState = STATE_PREPARED
-//        }
-//        mediaPlayer.setOnCompletionListener {
-//            binding.playButton.setImageResource(R.drawable.btn_play)
-//            playerState = STATE_PREPARED
-//
-//            handler.removeCallbacks(playbackRunnable)
-//            binding.playbackProgress.text = getString(R.string.zeroZero)
-//        }
-//    }
 
-//    private fun startPlayer() {
-//        mediaPlayer.start()
-//        binding.playButton.setImageResource(R.drawable.btn_pause)
-//        playerState = STATE_PLAYING
-//        playbackProgressCounter()
-//    }
+    private fun pausePlayer() {
+        playerInteractor.pausePlayer()
+        binding.playButton.setImageResource(R.drawable.btn_play)
+        handler.removeCallbacks(playbackRunnable)
+    }
 
-//    private fun pausePlayer() {
-//        mediaPlayer.pause()
-//        binding.playButton.setImageResource(R.drawable.btn_play)
-//        playerState = STATE_PAUSED
-//        handler.removeCallbacks(playbackRunnable)
-//    }
+    private fun startPlayer() {
+        playerInteractor.startPlayer()
+        binding.playButton.setImageResource(R.drawable.btn_pause)
+        playbackProgressCounter()
+    }
 
-//    private fun playbackControl() {
-//        when(playerState) {
-//            STATE_PLAYING -> {
-//                pausePlayer()
-//            }
-//            STATE_PREPARED, STATE_PAUSED -> {
-//                startPlayer()
-//            }
-//        }
-//    }
+    private fun playbackControl(state: PlayerState) {
+        when(state) {
+            PlayerState.PLAYING -> {
+                pausePlayer()
+            }
+            PlayerState.PREPARED, PlayerState.PAUSED -> {
+                startPlayer()
+            }
+            PlayerState.DEFAULT -> {
+                // playerInteractor.preparePlayer(currentTrack.previewUrl)
+
+                binding.playButton.isEnabled = true
+
+                handler.removeCallbacks(playbackRunnable)
+                binding.playbackProgress.text = getString(R.string.zeroZero)
+            }
+        }
+    }
 
     private fun playbackProgressCounter() {
-        // if (playerState == STATE_PLAYING) {
-            binding.playbackProgress.text = dateFormat.format(playerInteractor.getCurrentPosition())
-            handler.postDelayed(playbackRunnable, 300)
-        // }
+        binding.playbackProgress.text = dateFormat.format(playerInteractor.getCurrentPosition())
+        handler.postDelayed(playbackRunnable, 300)
     }
 }
