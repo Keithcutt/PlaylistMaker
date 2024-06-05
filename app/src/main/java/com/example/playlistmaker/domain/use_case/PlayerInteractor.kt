@@ -1,15 +1,17 @@
 package com.example.playlistmaker.domain.use_case
 
 import com.example.playlistmaker.domain.api.OnPlayerStateChangeListener
+import com.example.playlistmaker.domain.models.PlayerState
 
 interface PlayerInteractor {
 
-    fun setUrl(url: String)
-    fun preparePlayer()
+    fun preparePlayer(url: String)
     fun startPlayer()
     fun pausePlayer()
     fun releasePlayer()
     // fun playbackControl()
     fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener)
     fun getCurrentPosition() : Int
+    fun getPlayerState(): PlayerState
+
 }

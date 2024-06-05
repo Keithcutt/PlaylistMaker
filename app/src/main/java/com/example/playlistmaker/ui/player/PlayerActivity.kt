@@ -46,13 +46,20 @@ class PlayerActivity : AppCompatActivity() {
         binding.backButton.setOnClickListener { finish() }
 
         // Сначала нужно подготовить плеер, и тут уже требуется передавать слушатель
-        playerInteractor.setUrl(currentTrack.previewUrl)
+        playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
+            override fun onChange(state: PlayerState) {
+                playbackCases(state)
+            }
+        })
+        playerInteractor.preparePlayer(currentTrack.previewUrl)
         binding.playButton.setOnClickListener {
-            playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
-                override fun onChange(state: PlayerState) {
-                    playbackControl(state)
-                }
-            })
+//            playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
+//                override fun onChange(state: PlayerState) {
+//                    playbackControl(state)
+//                }
+//            })
+
+            playbackControl(playerInteractor.getPlayerState())
         }
     }
 
@@ -111,22 +118,41 @@ class PlayerActivity : AppCompatActivity() {
         playbackProgressCounter()
     }
 
-    private fun playbackControl(state: PlayerState) {
+    private fun playbackCases(state: PlayerState) {
         when(state) {
             PlayerState.PLAYING -> {
-                pausePlayer()
-            }
-            PlayerState.PREPARED, PlayerState.PAUSED -> {
+                // pausePlayer()
                 startPlayer()
             }
+            PlayerState.PAUSED -> {
+                // startPlayer()
+                pausePlayer()
+            }
+            PlayerState.PREPARED -> {
+                // binding.playButton.isEnabled = true
+            }
+
             PlayerState.DEFAULT -> {
                 // playerInteractor.preparePlayer(currentTrack.previewUrl)
-
                 binding.playButton.isEnabled = true
 
                 handler.removeCallbacks(playbackRunnable)
                 binding.playbackProgress.text = getString(R.string.zeroZero)
+                binding.playButton.setImageResource(R.drawable.btn_play)
             }
+        }
+    }
+
+    private fun playbackControl(state: PlayerState) {
+        when(playerInteractor.getPlayerState()) {
+            PlayerState.PLAYING -> {
+                pausePlayer()
+            }
+
+            PlayerState.PREPARED, PlayerState.PAUSED -> {
+                startPlayer()
+            }
+            else -> {}
         }
     }
 

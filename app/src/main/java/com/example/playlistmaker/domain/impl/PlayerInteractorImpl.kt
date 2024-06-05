@@ -2,6 +2,7 @@ package com.example.playlistmaker.domain.impl
 
 import com.example.playlistmaker.data.repository.PlayerRepositoryImpl
 import com.example.playlistmaker.domain.api.OnPlayerStateChangeListener
+import com.example.playlistmaker.domain.models.PlayerState
 import com.example.playlistmaker.domain.repository.PlayerRepository
 import com.example.playlistmaker.domain.use_case.PlayerInteractor
 
@@ -10,12 +11,9 @@ class PlayerInteractorImpl(
 ) : PlayerInteractor {
 
     // Здесь просто выполняем те методы которые есть в репозитории
-    override fun setUrl(url: String) {
-        playerRepository.setUrl(url)
-    }
 
-    override fun preparePlayer() {
-        playerRepository.preparePlayer()
+    override fun preparePlayer(url: String) {
+        playerRepository.preparePlayer(url)
     }
 
     override fun startPlayer() {
@@ -40,5 +38,9 @@ class PlayerInteractorImpl(
 
     override fun getCurrentPosition(): Int {
         return playerRepository.getCurrentPosition()
+    }
+
+    override fun getPlayerState(): PlayerState {
+        return playerRepository.getPlayerState()
     }
 }

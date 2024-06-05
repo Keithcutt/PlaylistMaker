@@ -8,26 +8,20 @@ import com.example.playlistmaker.domain.repository.PlayerRepository
 class PlayerRepositoryImpl() : PlayerRepository {
 
     private var playerState = PlayerState.DEFAULT
-    private lateinit var mediaPlayerUrl: String
     private var mediaPlayer = MediaPlayer()
     private lateinit var onStateChangeListener : OnPlayerStateChangeListener
 
-    // Нужно подготовить плеер, т.е. передать в него URL нужного трека
-    override fun setUrl(url: String) {
-        mediaPlayerUrl = url
-
-    }
-
-    override fun preparePlayer() {
+    override fun preparePlayer(url: String) {
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
             // playerState = PlayerState.PREPARED
+
             //вызвать слушатель
-            onStateChangeListener.onChange(PlayerState.PREPARED)
+            onStateChangeListener.onChange(playerState)
+            playerState = PlayerState.PREPARED
 
             // binding.playButton.isEnabled = true
-
         }
 
         mediaPlayer.setOnCompletionListener {
@@ -36,7 +30,10 @@ class PlayerRepositoryImpl() : PlayerRepository {
             // binding.playButton.setImageResource(R.drawable.btn_play)
             // handler.removeCallbacks(playbackRunnable)
             // binding.playbackProgress.text = getString(R.string.zeroZero)
-            onStateChangeListener.onChange(PlayerState.PREPARED)
+
+            onStateChangeListener.onChange(playerState)
+            playerState = PlayerState.PREPARED
+
         }
     }
 
@@ -47,8 +44,8 @@ class PlayerRepositoryImpl() : PlayerRepository {
 
         // binding.playButton.setImageResource(R.drawable.btn_pause)
         // playbackProgressCounter()
-        onStateChangeListener.onChange(PlayerState.PLAYING)
-
+        playerState = PlayerState.PLAYING
+        onStateChangeListener.onChange(playerState)
     }
 
     override fun pausePlayer() {
@@ -57,7 +54,8 @@ class PlayerRepositoryImpl() : PlayerRepository {
 
         // handler.removeCallbacks(playbackRunnable)
         // binding.playButton.setImageResource(R.drawable.btn_play)
-        onStateChangeListener.onChange(PlayerState.PAUSED)
+        playerState = PlayerState.PAUSED
+        onStateChangeListener.onChange(playerState)
     }
 
     override fun releasePlayer() {
@@ -83,5 +81,9 @@ class PlayerRepositoryImpl() : PlayerRepository {
 
     override fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener) {
         onStateChangeListener = listener
+    }
+
+    override fun getPlayerState(): PlayerState {
+        return playerState
     }
 }
