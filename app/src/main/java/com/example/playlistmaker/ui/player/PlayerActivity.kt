@@ -30,7 +30,7 @@ class PlayerActivity : AppCompatActivity() {
     // private lateinit var currentTrack: Track
 
     private val handler = Handler(Looper.getMainLooper())
-    private val playbackRunnable = { playbackProgressCounter() }
+    private val playbackRunnable = { playbackProgressCounter(playerInteractor.getPlayerState()) }
 
     private val playerInteractor = Creator.provideInteractor()
 
@@ -45,7 +45,6 @@ class PlayerActivity : AppCompatActivity() {
 
         binding.backButton.setOnClickListener { finish() }
 
-        // Сначала нужно подготовить плеер, и тут уже требуется передавать слушатель
         playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
             override fun onChange(state: PlayerState) {
                 playbackCases(state)
@@ -115,36 +114,31 @@ class PlayerActivity : AppCompatActivity() {
     private fun startPlayer() {
         playerInteractor.startPlayer()
         binding.playButton.setImageResource(R.drawable.btn_pause)
-        playbackProgressCounter()
+        playbackProgressCounter(playerInteractor.getPlayerState())
     }
 
     private fun playbackCases(state: PlayerState) {
         when(state) {
             PlayerState.PLAYING -> {
-                // pausePlayer()
                 startPlayer()
             }
             PlayerState.PAUSED -> {
-                // startPlayer()
                 pausePlayer()
             }
             PlayerState.PREPARED -> {
-                // binding.playButton.isEnabled = true
-            }
-
-            PlayerState.DEFAULT -> {
-                // playerInteractor.preparePlayer(currentTrack.previewUrl)
-                binding.playButton.isEnabled = true
-
                 handler.removeCallbacks(playbackRunnable)
                 binding.playbackProgress.text = getString(R.string.zeroZero)
                 binding.playButton.setImageResource(R.drawable.btn_play)
+            }
+
+            PlayerState.DEFAULT -> {
+                binding.playButton.isEnabled = true
             }
         }
     }
 
     private fun playbackControl(state: PlayerState) {
-        when(playerInteractor.getPlayerState()) {
+        when(state) {
             PlayerState.PLAYING -> {
                 pausePlayer()
             }
@@ -156,8 +150,10 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun playbackProgressCounter() {
-        binding.playbackProgress.text = dateFormat.format(playerInteractor.getCurrentPosition())
-        handler.postDelayed(playbackRunnable, 300)
+    private fun playbackProgressCounter(state: PlayerState) {
+        if (state == PlayerState.PLAYING) {
+            binding.playbackProgress.text = dateFormat.format(playerInteractor.getCurrentPosition())
+            handler.postDelayed(playbackRunnable, 300)
+        }
     }
 }

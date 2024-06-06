@@ -14,4 +14,5 @@ interface PlayerRepository {
     fun getCurrentPosition() : Int
 
     fun getPlayerState(): PlayerState
+    fun setPlayerState(state: PlayerState)
 }

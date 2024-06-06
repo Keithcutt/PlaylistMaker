@@ -43,4 +43,8 @@ class PlayerInteractorImpl(
     override fun getPlayerState(): PlayerState {
         return playerRepository.getPlayerState()
     }
+
+    override fun setPlayerState(state: PlayerState) {
+        playerRepository.setPlayerState(state)
+    }
 }

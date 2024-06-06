@@ -17,7 +17,6 @@ class PlayerRepositoryImpl() : PlayerRepository {
         mediaPlayer.setOnPreparedListener {
             // playerState = PlayerState.PREPARED
 
-            //вызвать слушатель
             onStateChangeListener.onChange(playerState)
             playerState = PlayerState.PREPARED
 
@@ -31,9 +30,9 @@ class PlayerRepositoryImpl() : PlayerRepository {
             // handler.removeCallbacks(playbackRunnable)
             // binding.playbackProgress.text = getString(R.string.zeroZero)
 
-            onStateChangeListener.onChange(playerState)
-            playerState = PlayerState.PREPARED
 
+            playerState = PlayerState.PREPARED
+            onStateChangeListener.onChange(PlayerState.PREPARED)
         }
     }
 
@@ -85,5 +84,9 @@ class PlayerRepositoryImpl() : PlayerRepository {
 
     override fun getPlayerState(): PlayerState {
         return playerState
+    }
+
+    override fun setPlayerState(state: PlayerState) {
+        playerState = state
     }
 }
