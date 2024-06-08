@@ -11,7 +11,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.domain.api.OnPlayerStateChangeListener
+import com.example.playlistmaker.domain.repository.OnPlayerStateChangeListener
 import com.example.playlistmaker.domain.models.PlayerState
 import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
@@ -27,7 +27,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
-    // private lateinit var currentTrack: Track
 
     private val handler = Handler(Looper.getMainLooper())
     private val playbackRunnable = { playbackProgressCounter(playerInteractor.getPlayerState()) }
@@ -39,7 +38,6 @@ class PlayerActivity : AppCompatActivity() {
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // val
         val currentTrack = getCurrentTrack()
         bindData(currentTrack)
 
@@ -52,12 +50,6 @@ class PlayerActivity : AppCompatActivity() {
         })
         playerInteractor.preparePlayer(currentTrack.previewUrl)
         binding.playButton.setOnClickListener {
-//            playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
-//                override fun onChange(state: PlayerState) {
-//                    playbackControl(state)
-//                }
-//            })
-
             playbackControl(playerInteractor.getPlayerState())
         }
     }
@@ -104,26 +96,15 @@ class PlayerActivity : AppCompatActivity() {
             context.resources.displayMetrics).toInt()
     }
 
-
-    private fun pausePlayer() {
-        playerInteractor.pausePlayer()
-        binding.playButton.setImageResource(R.drawable.btn_play)
-        handler.removeCallbacks(playbackRunnable)
-    }
-
-    private fun startPlayer() {
-        playerInteractor.startPlayer()
-        binding.playButton.setImageResource(R.drawable.btn_pause)
-        playbackProgressCounter(playerInteractor.getPlayerState())
-    }
-
     private fun playbackCases(state: PlayerState) {
         when(state) {
             PlayerState.PLAYING -> {
-                startPlayer()
+                binding.playButton.setImageResource(R.drawable.btn_pause)
+                playbackProgressCounter(playerInteractor.getPlayerState())
             }
             PlayerState.PAUSED -> {
-                pausePlayer()
+                binding.playButton.setImageResource(R.drawable.btn_play)
+                handler.removeCallbacks(playbackRunnable)
             }
             PlayerState.PREPARED -> {
                 handler.removeCallbacks(playbackRunnable)
@@ -140,11 +121,11 @@ class PlayerActivity : AppCompatActivity() {
     private fun playbackControl(state: PlayerState) {
         when(state) {
             PlayerState.PLAYING -> {
-                pausePlayer()
+                playerInteractor.pausePlayer()
             }
 
             PlayerState.PREPARED, PlayerState.PAUSED -> {
-                startPlayer()
+                playerInteractor.startPlayer()
             }
             else -> {}
         }

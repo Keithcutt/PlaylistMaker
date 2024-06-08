@@ -1,16 +1,13 @@
 package com.example.playlistmaker.domain.impl
 
-import com.example.playlistmaker.data.repository.PlayerRepositoryImpl
-import com.example.playlistmaker.domain.api.OnPlayerStateChangeListener
+import com.example.playlistmaker.domain.repository.OnPlayerStateChangeListener
 import com.example.playlistmaker.domain.models.PlayerState
 import com.example.playlistmaker.domain.repository.PlayerRepository
 import com.example.playlistmaker.domain.use_case.PlayerInteractor
 
 class PlayerInteractorImpl(
-    private val playerRepository: PlayerRepository // интерфейс, который будет реализовать медиаплеер (?)
+    private val playerRepository: PlayerRepository
 ) : PlayerInteractor {
-
-    // Здесь просто выполняем те методы которые есть в репозитории
 
     override fun preparePlayer(url: String) {
         playerRepository.preparePlayer(url)
@@ -28,10 +25,6 @@ class PlayerInteractorImpl(
         playerRepository.releasePlayer()
     }
 
-//     override fun playbackControl() {
-//         playerRepository.playbackControl()
-//    }
-
     override fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener) {
         playerRepository.setOnPlayerStateChangeListener(listener)
     }
@@ -42,9 +35,5 @@ class PlayerInteractorImpl(
 
     override fun getPlayerState(): PlayerState {
         return playerRepository.getPlayerState()
-    }
-
-    override fun setPlayerState(state: PlayerState) {
-        playerRepository.setPlayerState(state)
     }
 }
