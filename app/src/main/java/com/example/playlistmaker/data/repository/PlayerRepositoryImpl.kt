@@ -5,10 +5,9 @@ import com.example.playlistmaker.domain.repository.OnPlayerStateChangeListener
 import com.example.playlistmaker.domain.models.PlayerState
 import com.example.playlistmaker.domain.repository.PlayerRepository
 
-class PlayerRepositoryImpl() : PlayerRepository {
+class PlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) : PlayerRepository {
 
     private var playerState = PlayerState.DEFAULT
-    private var mediaPlayer = MediaPlayer()
     private lateinit var onStateChangeListener : OnPlayerStateChangeListener
 
     override fun preparePlayer(url: String) {

@@ -18,7 +18,7 @@ import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.ui.player.PlayerActivity
+import com.example.playlistmaker.presentation.ui.player.PlayerActivity
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
 import retrofit2.Call

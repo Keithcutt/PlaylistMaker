@@ -1,4 +1,4 @@
-package com.example.playlistmaker.ui.player
+package com.example.playlistmaker.presentation.ui.player
 
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
@@ -21,7 +21,6 @@ import java.util.Locale
 class PlayerActivity : AppCompatActivity() {
 
     private companion object {
-        const val TRACK_KEY = "track"
         const val ARTWORK_CORNER_RADIUS = 8
     }
 
@@ -32,22 +31,19 @@ class PlayerActivity : AppCompatActivity() {
     private val playbackRunnable = { playbackProgressCounter(playerInteractor.getPlayerState()) }
 
     private val playerInteractor = Creator.provideInteractor()
+    private lateinit var currentTrack: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val currentTrack = getCurrentTrack()
+        currentTrack = Creator.provideCurrentTrack(intent)
         bindData(currentTrack)
 
         binding.backButton.setOnClickListener { finish() }
 
-        playerInteractor.setOnPlayerStateChangeListener(object : OnPlayerStateChangeListener {
-            override fun onChange(state: PlayerState) {
-                playbackCases(state)
-            }
-        })
+        playerInteractor.setOnPlayerStateChangeListener { state -> playbackCases(state) }
         playerInteractor.preparePlayer(currentTrack.previewUrl)
         binding.playButton.setOnClickListener {
             playbackControl(playerInteractor.getPlayerState())
@@ -64,11 +60,6 @@ class PlayerActivity : AppCompatActivity() {
         playerInteractor.releasePlayer()
 
         handler.removeCallbacks(playbackRunnable)
-    }
-
-    private fun getCurrentTrack(): Track {
-        val json = intent.getStringExtra(TRACK_KEY)
-        return Gson().fromJson(json, Track::class.java)
     }
 
     private fun bindData(model: Track) {

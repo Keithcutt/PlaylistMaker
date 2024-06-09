@@ -9,6 +9,6 @@ interface PlayerRepository {
     fun pausePlayer()
     fun releasePlayer()
     fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener)
-    fun getCurrentPosition() : Int
+    fun getCurrentPosition(): Int
     fun getPlayerState(): PlayerState
 }
