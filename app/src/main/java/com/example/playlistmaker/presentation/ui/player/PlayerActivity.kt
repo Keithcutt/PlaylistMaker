@@ -1,7 +1,6 @@
-package com.example.playlistmaker.player
+package com.example.playlistmaker.presentation.ui.player
 
 import android.content.Context
-import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
@@ -10,8 +9,11 @@ import android.util.TypedValue
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.Track
+import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.domain.repository.OnPlayerStateChangeListener
+import com.example.playlistmaker.domain.models.PlayerState
+import com.example.playlistmaker.domain.models.Track
 import com.google.gson.Gson
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -19,48 +21,43 @@ import java.util.Locale
 class PlayerActivity : AppCompatActivity() {
 
     private companion object {
-        const val TRACK_KEY = "track"
         const val ARTWORK_CORNER_RADIUS = 8
-
-        const val STATE_DEFAULT = 0
-        const val STATE_PREPARED = 1
-        const val STATE_PLAYING = 2
-        const val STATE_PAUSED = 3
     }
 
     private lateinit var binding: ActivityPlayerBinding
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
 
-    private var playerState = STATE_DEFAULT
-    private var mediaPlayer = MediaPlayer()
-
     private val handler = Handler(Looper.getMainLooper())
-    private val playbackRunnable = { playbackProgressCounter() }
+    private val playbackRunnable = { playbackProgressCounter(playerInteractor.getPlayerState()) }
+
+    private val playerInteractor = Creator.provideInteractor()
+    private lateinit var currentTrack: Track
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val json = intent.getStringExtra(TRACK_KEY)
-        val currentTrack = Gson().fromJson(json, Track::class.java)
+
+        currentTrack = Creator.provideCurrentTrack(intent)
         bindData(currentTrack)
 
         binding.backButton.setOnClickListener { finish() }
 
-        preparePlayer(currentTrack.previewUrl)
+        playerInteractor.setOnPlayerStateChangeListener { state -> playbackCases(state) }
+        playerInteractor.preparePlayer(currentTrack.previewUrl)
         binding.playButton.setOnClickListener {
-            playbackControl()
+            playbackControl(playerInteractor.getPlayerState())
         }
     }
 
     override fun onPause() {
         super.onPause()
-        pausePlayer()
+        playerInteractor.pausePlayer()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer.release()
+        playerInteractor.releasePlayer()
 
         handler.removeCallbacks(playbackRunnable)
     }
@@ -90,50 +87,44 @@ class PlayerActivity : AppCompatActivity() {
             context.resources.displayMetrics).toInt()
     }
 
-    private fun preparePlayer(url: String) {
-        mediaPlayer.setDataSource(url)
-        mediaPlayer.prepareAsync()
-        mediaPlayer.setOnPreparedListener {
-            binding.playButton.isEnabled = true
-            playerState = STATE_PREPARED
-        }
-        mediaPlayer.setOnCompletionListener {
-            binding.playButton.setImageResource(R.drawable.btn_play)
-            playerState = STATE_PREPARED
-
-            handler.removeCallbacks(playbackRunnable)
-            binding.playbackProgress.text = getString(R.string.zeroZero)
-        }
-    }
-
-    private fun startPlayer() {
-        mediaPlayer.start()
-        binding.playButton.setImageResource(R.drawable.btn_pause)
-        playerState = STATE_PLAYING
-        playbackProgressCounter()
-    }
-
-    private fun pausePlayer() {
-        mediaPlayer.pause()
-        binding.playButton.setImageResource(R.drawable.btn_play)
-        playerState = STATE_PAUSED
-        handler.removeCallbacks(playbackRunnable)
-    }
-
-    private fun playbackControl() {
-        when(playerState) {
-            STATE_PLAYING -> {
-                pausePlayer()
+    private fun playbackCases(state: PlayerState) {
+        when(state) {
+            PlayerState.PLAYING -> {
+                binding.playButton.setImageResource(R.drawable.btn_pause)
+                playbackProgressCounter(playerInteractor.getPlayerState())
             }
-            STATE_PREPARED, STATE_PAUSED -> {
-                startPlayer()
+            PlayerState.PAUSED -> {
+                binding.playButton.setImageResource(R.drawable.btn_play)
+                handler.removeCallbacks(playbackRunnable)
+            }
+            PlayerState.PREPARED -> {
+                handler.removeCallbacks(playbackRunnable)
+                binding.playbackProgress.text = getString(R.string.zeroZero)
+                binding.playButton.setImageResource(R.drawable.btn_play)
+            }
+
+            PlayerState.DEFAULT -> {
+                binding.playButton.isEnabled = true
             }
         }
     }
 
-    private fun playbackProgressCounter() {
-        if (playerState == STATE_PLAYING) {
-            binding.playbackProgress.text = dateFormat.format(mediaPlayer.currentPosition)
+    private fun playbackControl(state: PlayerState) {
+        when(state) {
+            PlayerState.PLAYING -> {
+                playerInteractor.pausePlayer()
+            }
+
+            PlayerState.PREPARED, PlayerState.PAUSED -> {
+                playerInteractor.startPlayer()
+            }
+            else -> {}
+        }
+    }
+
+    private fun playbackProgressCounter(state: PlayerState) {
+        if (state == PlayerState.PLAYING) {
+            binding.playbackProgress.text = dateFormat.format(playerInteractor.getCurrentPosition())
             handler.postDelayed(playbackRunnable, 300)
         }
     }
