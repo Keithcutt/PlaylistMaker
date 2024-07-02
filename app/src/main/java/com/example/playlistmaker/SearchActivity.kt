@@ -17,15 +17,13 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.example.playlistmaker.domain.models.Track
-import com.example.playlistmaker.presentation.ui.player.PlayerActivity
+import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.search.data.dto.TrackDto
+import com.example.playlistmaker.player.ui.PlayerActivity
+import com.example.playlistmaker.search.domain.api.TracksInteractor
+import com.example.playlistmaker.search.domain.models.Track
 import com.google.android.material.button.MaterialButton
 import com.google.gson.Gson
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SearchActivity : AppCompatActivity() {
 
@@ -53,18 +51,20 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var searchHistoryViewGroup: LinearLayout
 
     private var savedInput: String? = null
-    private var foundTracks: MutableList<Track> = mutableListOf()
+    private var tracks: MutableList<Track> = mutableListOf() //Dto
 
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("https://itunes.apple.com")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+//    private val retrofit = Retrofit.Builder()
+//        .baseUrl("https://itunes.apple.com")
+//        .addConverterFactory(GsonConverterFactory.create())
+//        .build()
 
-    private val iTunesApiService = retrofit.create(ITunesApi::class.java)
+//    private val iTunesApiService = retrofit.create(ITunesApiService::class.java)
 
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchQuery(savedInput) }
     private var isClickAllowed = true
+
+    private val tracksInteractor = Creator.provideTracksInteractor(this)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -82,7 +82,7 @@ class SearchActivity : AppCompatActivity() {
         noInternetConnectionPlaceholder = findViewById(R.id.placeholder_no_internet)
         updateButton = findViewById(R.id.update_btn)
         updateButton.setOnClickListener {
-            searchQuery(savedInput)
+             searchQuery(savedInput)
         }
 
         createSearchHistoryHandler()
@@ -137,7 +137,7 @@ class SearchActivity : AppCompatActivity() {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 searchQuery(savedInput)
                 handler.removeCallbacks(searchRunnable)
-                true
+                // true
             }
             false
         }
@@ -188,13 +188,13 @@ class SearchActivity : AppCompatActivity() {
 
     private fun showNotFoundMessage(isTurnedOn: Boolean) {
         notFoundPlaceholder.isVisible = isTurnedOn
-        foundTracks.clear()
+        tracks.clear()
         searchAdapter.notifyDataSetChanged()
     }
 
     private fun showNoInternetConnectionMessage(isTurnedOn: Boolean) {
         noInternetConnectionPlaceholder.isVisible = isTurnedOn
-        foundTracks.clear()
+        tracks.clear()
         searchAdapter.notifyDataSetChanged()
 
     }
@@ -213,7 +213,7 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun createSearchAdapter() {
-        searchAdapter = SearchAdapter(foundTracks) {
+        searchAdapter = SearchAdapter(tracks) {
             searchHistory.save(it)
             startPlayerActivity(it)
         }
@@ -222,52 +222,95 @@ class SearchActivity : AppCompatActivity() {
     private fun showSearchHistory() {
         searchHistoryViewGroup.isVisible = true
         rvSearch.isVisible = false
-        foundTracks.clear()
-        foundTracks.addAll(searchHistory.getSearchHistory())
+        tracks.clear()
+        tracks.addAll(searchHistory.getSearchHistory())
         searchAdapter.notifyDataSetChanged()
         rvSearchHistory.adapter = searchAdapter
     }
 
-    private fun searchQuery(requestText: String?) {
-        if (requestText?.isBlank() == false) requestText.let {
+//    private fun searchQuery(requestText: String?) {
+//        if (requestText?.isBlank() == false) requestText.let {
+//            showNotFoundMessage(false)
+//            showNoInternetConnectionMessage(false)
+//            rvSearch.isVisible = false
+//            progressBar.isVisible = true
+//
+//            iTunesApiService.searchTracks(it).enqueue(object : Callback<TrackSearchResponse> {
+//                override fun onResponse(
+//                    call: Call<TrackSearchResponse>,
+//                    response: Response<TrackSearchResponse>
+//                ) {
+//                    progressBar.isVisible = false
+//                    when (response.code()) {
+//                        SUCCESSFUL_RESPONSE -> {
+//                            if (response.body()?.results?.isNotEmpty() == true) {
+//                                rvSearch.isVisible = true
+//                                foundTracks.clear()
+//                                foundTracks.addAll(response.body()?.results!!)
+//                                rvSearch.adapter = searchAdapter
+//                                searchAdapter.notifyDataSetChanged()
+//
+//                            } else {
+//                                showNotFoundMessage(true)
+//                                rvSearch.isVisible = false
+//                            }
+//                        }
+//                        else -> {
+//                            showNoInternetConnectionMessage(true)
+//                            rvSearch.isVisible = false
+//                            progressBar.isVisible = false
+//                        }
+//                    }
+//                }
+//
+//                override fun onFailure(call: Call<TrackSearchResponse>, t: Throwable) {
+//                    showNoInternetConnectionMessage(true)
+//                    rvSearch.isVisible = false
+//                    progressBar.isVisible = false
+//                }
+//            })
+//        }
+//    }
+
+    private fun searchQuery(expression: String?) {
+        if (expression?.isBlank() == false) expression.let {
+
             showNotFoundMessage(false)
             showNoInternetConnectionMessage(false)
             rvSearch.isVisible = false
             progressBar.isVisible = true
 
-            iTunesApiService.search(it).enqueue(object : Callback<TrackResponse> {
-                override fun onResponse(
-                    call: Call<TrackResponse>,
-                    response: Response<TrackResponse>
-                ) {
-                    progressBar.isVisible = false
-                    when (response.code()) {
-                        SUCCESSFUL_RESPONSE -> {
-                            if (response.body()?.results?.isNotEmpty() == true) {
-                                rvSearch.isVisible = true
-                                foundTracks.clear()
-                                foundTracks.addAll(response.body()?.results!!)
-                                rvSearch.adapter = searchAdapter
-                                searchAdapter.notifyDataSetChanged()
+            tracksInteractor.searchTracks(it, object : TracksInteractor.TracksConsumer{
+                override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
+                    handler.post{
+                        progressBar.isVisible = false
 
-                            } else {
-                                showNotFoundMessage(true)
-                                rvSearch.isVisible = false
-                            }
+                        if (foundTracks != null) {
+                            rvSearch.isVisible = true
+                            tracks.clear()
+                            tracks.addAll(foundTracks)
+                            rvSearch.adapter = searchAdapter
+                            searchAdapter.notifyDataSetChanged()
                         }
-                        else -> {
+                        if (errorMessage != null) {
                             showNoInternetConnectionMessage(true)
                             rvSearch.isVisible = false
                             progressBar.isVisible = false
+                        } else if (tracks.isEmpty()) {
+                            showNotFoundMessage(true)
+                            rvSearch.isVisible = false
                         }
+
+//                        if (errorMessage != null) {
+//                            showMessage(activity.getString(R.string.something_went_wrong), errorMessage)
+//                        } else if (movies.isEmpty()) {
+//                            showMessage(activity.getString(R.string.nothing_found), "")
+//                        } else {
+//                            hideMessage()
+//                        }
                     }
                 }
 
-                override fun onFailure(call: Call<TrackResponse>, t: Throwable) {
-                    showNoInternetConnectionMessage(true)
-                    rvSearch.isVisible = false
-                    progressBar.isVisible = false
-                }
             })
         }
     }
