@@ -2,7 +2,6 @@ package com.example.playlistmaker
 
 import android.content.Context
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,10 +14,10 @@ import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.search.data.dto.TrackDto
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.api.TracksInteractor
 import com.example.playlistmaker.search.domain.models.Track
@@ -30,8 +29,6 @@ class SearchActivity : AppCompatActivity() {
     private companion object {
         const val TEXT_INPUT = "TEXT_INPUT"
         const val TEXT_EMPTY = ""
-        const val SUCCESSFUL_RESPONSE = 200
-        const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
         const val TRACK_KEY = "track"
         const val SEARCH_DEBOUNCE_DELAY = 2000L
         const val CLICK_DEBOUNCE_DELAY = 1000L
@@ -47,18 +44,12 @@ class SearchActivity : AppCompatActivity() {
     private lateinit var progressBar: ProgressBar
 
     private lateinit var rvSearchHistory: RecyclerView
-    private lateinit var searchHistory: SearchHistory
     private lateinit var searchHistoryViewGroup: LinearLayout
+    private val sharedPreferences = Creator.provideSharedPreferences()
+    private val searchHistoryInteractor = Creator.provideSearchHistoryInteractor(sharedPreferences)
 
     private var savedInput: String? = null
-    private var tracks: MutableList<Track> = mutableListOf() //Dto
-
-//    private val retrofit = Retrofit.Builder()
-//        .baseUrl("https://itunes.apple.com")
-//        .addConverterFactory(GsonConverterFactory.create())
-//        .build()
-
-//    private val iTunesApiService = retrofit.create(ITunesApiService::class.java)
+    private var tracks: MutableList<Track> = mutableListOf()
 
     private val handler = Handler(Looper.getMainLooper())
     private val searchRunnable = Runnable { searchQuery(savedInput) }
@@ -85,12 +76,11 @@ class SearchActivity : AppCompatActivity() {
              searchQuery(savedInput)
         }
 
-        createSearchHistoryHandler()
         rvSearchHistory = findViewById(R.id.rv_search_history)
         searchHistoryViewGroup = findViewById(R.id.search_history_viewgroup)
         val clearHistoryButton = findViewById<MaterialButton>(R.id.clear_history_btn)
         clearHistoryButton.setOnClickListener{
-            searchHistory.clear()
+            searchHistoryInteractor.clear()
             searchHistoryViewGroup.isVisible = false
         }
 
@@ -121,7 +111,7 @@ class SearchActivity : AppCompatActivity() {
                     showNotFoundMessage(false)
                     savedInput = null
 
-                    if (searchHistory.isSearchHistoryNotEmpty())
+                    if (searchHistoryInteractor.isSearchHistoryNotEmpty())
                         showSearchHistory()
                 } else {
                     searchHistoryViewGroup.isVisible = false
@@ -149,7 +139,7 @@ class SearchActivity : AppCompatActivity() {
                 showNoInternetConnectionMessage(false)
                 savedInput = null
 
-                if (searchHistory.isSearchHistoryNotEmpty()) showSearchHistory()
+                if (searchHistoryInteractor.isSearchHistoryNotEmpty()) showSearchHistory()
 
             } else {
                 searchHistoryViewGroup.isVisible = false
@@ -199,11 +189,6 @@ class SearchActivity : AppCompatActivity() {
 
     }
 
-    private fun createSearchHistoryHandler() {
-        val sharedPreferences = getSharedPreferences(SEARCH_HISTORY_PREFERENCES, MODE_PRIVATE)
-        searchHistory = SearchHistory(sharedPreferences)
-    }
-
     private fun startPlayerActivity(track: Track) {
         if (clickDebounce()) {
             val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
@@ -214,7 +199,7 @@ class SearchActivity : AppCompatActivity() {
 
     private fun createSearchAdapter() {
         searchAdapter = SearchAdapter(tracks) {
-            searchHistory.save(it)
+            searchHistoryInteractor.save(it)
             startPlayerActivity(it)
         }
     }
@@ -223,54 +208,10 @@ class SearchActivity : AppCompatActivity() {
         searchHistoryViewGroup.isVisible = true
         rvSearch.isVisible = false
         tracks.clear()
-        tracks.addAll(searchHistory.getSearchHistory())
+        tracks.addAll(searchHistoryInteractor.getSearchHistory())
         searchAdapter.notifyDataSetChanged()
         rvSearchHistory.adapter = searchAdapter
     }
-
-//    private fun searchQuery(requestText: String?) {
-//        if (requestText?.isBlank() == false) requestText.let {
-//            showNotFoundMessage(false)
-//            showNoInternetConnectionMessage(false)
-//            rvSearch.isVisible = false
-//            progressBar.isVisible = true
-//
-//            iTunesApiService.searchTracks(it).enqueue(object : Callback<TrackSearchResponse> {
-//                override fun onResponse(
-//                    call: Call<TrackSearchResponse>,
-//                    response: Response<TrackSearchResponse>
-//                ) {
-//                    progressBar.isVisible = false
-//                    when (response.code()) {
-//                        SUCCESSFUL_RESPONSE -> {
-//                            if (response.body()?.results?.isNotEmpty() == true) {
-//                                rvSearch.isVisible = true
-//                                foundTracks.clear()
-//                                foundTracks.addAll(response.body()?.results!!)
-//                                rvSearch.adapter = searchAdapter
-//                                searchAdapter.notifyDataSetChanged()
-//
-//                            } else {
-//                                showNotFoundMessage(true)
-//                                rvSearch.isVisible = false
-//                            }
-//                        }
-//                        else -> {
-//                            showNoInternetConnectionMessage(true)
-//                            rvSearch.isVisible = false
-//                            progressBar.isVisible = false
-//                        }
-//                    }
-//                }
-//
-//                override fun onFailure(call: Call<TrackSearchResponse>, t: Throwable) {
-//                    showNoInternetConnectionMessage(true)
-//                    rvSearch.isVisible = false
-//                    progressBar.isVisible = false
-//                }
-//            })
-//        }
-//    }
 
     private fun searchQuery(expression: String?) {
         if (expression?.isBlank() == false) expression.let {

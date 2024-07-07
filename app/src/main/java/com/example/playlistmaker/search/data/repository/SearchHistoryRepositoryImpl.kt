@@ -1,12 +1,11 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.search.data.repository
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.search.domain.api.SearchHistoryRepository
 import com.example.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
 
-
-class SearchHistory(private val sharedPreferences: SharedPreferences) {
-
+class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) : SearchHistoryRepository {
     companion object {
         const val SEARCHED_TRACKS_KEY = "searched_tracks"
         const val EMPTY_STRING = ""
@@ -25,7 +24,7 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
         }
     }
 
-    fun save(track: Track) {
+    override fun save(track: Track) {
         for (i in searchedTracks) {
             if (track.trackId == i.trackId) {
                 searchedTracks.remove(i)
@@ -43,16 +42,16 @@ class SearchHistory(private val sharedPreferences: SharedPreferences) {
             .apply()
     }
 
-    fun clear() {
+    override fun clear() {
         searchedTracks.clear()
         sharedPreferences.edit()
             .putString(SEARCHED_TRACKS_KEY, EMPTY_STRING)
             .apply()
     }
 
-    fun getSearchHistory(): MutableList<Track> = searchedTracks
+    override fun getSearchHistory(): MutableList<Track> = searchedTracks
 
-    fun isSearchHistoryNotEmpty(): Boolean = searchedTracks.isNotEmpty()
+    override fun isSearchHistoryNotEmpty(): Boolean = searchedTracks.isNotEmpty()
     private fun createJsonFromTracks(tracks: MutableList<Track>): String {
         return Gson().toJson(tracks)
     }

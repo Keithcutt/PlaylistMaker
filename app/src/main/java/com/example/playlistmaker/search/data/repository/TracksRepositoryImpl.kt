@@ -9,13 +9,19 @@ import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.search.domain.models.Track
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
+
+    companion object{
+        private const val NO_INTERNET_CONNECTION = -1
+        private const val SUCCESSFUL_RESPONSE = 200
+    }
+
     override fun searchTracks(expression: String): Resource<List<Track>> {
         val response = networkClient.doRequest(TrackSearchRequest(expression))
 
         return when (response.resultCode) {
-            -1 -> Resource.Error("Отсутствует подключение к интернету") // Убрать
+            NO_INTERNET_CONNECTION -> Resource.Error("Отсутствует подключение к интернету") // Убрать
 
-            200 -> Resource.Success((response as TrackSearchResponse).results.map {
+            SUCCESSFUL_RESPONSE -> Resource.Success((response as TrackSearchResponse).results.map {
                     TrackMapper.map(it)
                 }
             )
