@@ -10,7 +10,6 @@ import com.example.playlistmaker.creator.Creator
 class App : Application() {
 
     private companion object {
-        // private const val PLAYLISTMAKER_PREFERENCES = "playlistmaker_preferences"
         private const val DARK_THEME = "key_for_theme_switcher"
     }
 
@@ -22,7 +21,7 @@ class App : Application() {
 
         Creator.initApplication(this)
 
-        sharedPreferences = Creator.provideSharedPreferences() // getSharedPreferences(PLAYLISTMAKER_PREFERENCES, MODE_PRIVATE)
+        sharedPreferences = Creator.provideSharedPreferences()
         switchTheme(
             sharedPreferences.getBoolean(
                 DARK_THEME,

@@ -66,7 +66,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.artistName.text = model.artistName
         binding.genreValue.text = model.primaryGenreName
         binding.countryValue.text = model.country
-        binding.yearValue.text = model.releaseDate.substringBefore("-")
+        binding.yearValue.text = model.releaseDate // .substringBefore("-") ушло в mapper
         binding.albumValue.text = model.collectionName
         binding.durationValue.text = dateFormat.format(model.trackTime)
 

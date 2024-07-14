@@ -1,13 +1,13 @@
 package com.example.playlistmaker.search.presentation.mapper
 
 import com.example.playlistmaker.search.domain.models.Track
-import com.example.playlistmaker.search.presentation.model.TrackInfo
+import com.example.playlistmaker.search.presentation.model.BriefTrackInfo
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-object TrackInfoMapper {
-    fun map(track: Track): TrackInfo {
-        return TrackInfo(
+object BriefTrackInfoMapper {
+    fun map(track: Track): BriefTrackInfo {
+        return BriefTrackInfo(
             trackName = track.trackName,
             artistName = track.artistName,
             trackTime = SimpleDateFormat("mm:ss", Locale.getDefault()).format(track.trackTime),

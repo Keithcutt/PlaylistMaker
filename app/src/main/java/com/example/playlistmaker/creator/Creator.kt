@@ -15,18 +15,16 @@ import com.example.playlistmaker.search.data.repository.SearchHistoryRepositoryI
 import com.example.playlistmaker.search.data.repository.TracksRepositoryImpl
 import com.example.playlistmaker.search.domain.api.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.api.SearchHistoryRepository
-import com.example.playlistmaker.search.domain.api.TracksInteractor
+import com.example.playlistmaker.search.domain.api.GetSearchTracksUseCase
 import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.search.domain.impl.SearchHistoryInteractorImpl
-import com.example.playlistmaker.search.domain.impl.TracksInteractorImpl
+import com.example.playlistmaker.search.domain.impl.GetSearchTracksUseCaseImpl
 import com.example.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
 
 object Creator {
 
     private const val TRACK_KEY = "track"
-
-    // private const val SEARCH_HISTORY_PREFERENCES = "search_history_shared_preferences"
     private const val PLAYLISTMAKER_PREFERENCES = "playlistmaker_preferences"
     private lateinit var application: Application
 
@@ -48,8 +46,8 @@ object Creator {
     }
 
 
-    fun provideTracksInteractor(context: Context): TracksInteractor {
-        return TracksInteractorImpl(getTracksRepository(context))
+    fun provideGetSearchTracksUseCase(): GetSearchTracksUseCase {
+        return GetSearchTracksUseCaseImpl(getTracksRepository(application.applicationContext))
     }
 
     private fun getTracksRepository(context: Context): TracksRepository {

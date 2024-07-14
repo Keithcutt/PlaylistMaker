@@ -1,8 +1,8 @@
 package com.example.playlistmaker.search.presentation.model
 
-data class TrackInfo(
+data class BriefTrackInfo(
     val trackName: String,
     val artistName: String,
-    val trackTime: String, // В строку
+    val trackTime: String,
     val artworkUrl100: String
 )
