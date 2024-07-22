@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".SearchActivity">
+    tools:context=".search.ui.activity.SearchActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:paddingEnd="@dimen/dp_52">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/back_btn"
+            android:id="@+id/back_button"
             style="@style/HeaderBackButton"
             android:layout_width="@dimen/dp_48"
             android:layout_height="wrap_content"
@@ -49,7 +49,7 @@
             android:src="@drawable/ic_search_16x16" />
 
         <EditText
-            android:id="@+id/search_bar"
+            android:id="@+id/search_field"
             style="@style/SearchBar"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -57,7 +57,7 @@
             android:layout_weight="1" />
 
         <ImageView
-            android:id="@+id/clear_icon"
+            android:id="@+id/clear_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -121,7 +121,7 @@
             android:text="@string/no_internet_connection" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/update_btn"
+            android:id="@+id/update_button"
             style="@style/SearchActivityButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -130,7 +130,7 @@
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/search_history_viewgroup"
+        android:id="@+id/search_history_view_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_45"
@@ -156,7 +156,7 @@
             tools:listitem="@layout/track_item" />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/clear_history_btn"
+            android:id="@+id/clear_history_button"
             style="@style/SearchActivityButtons"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

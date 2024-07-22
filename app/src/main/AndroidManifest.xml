@@ -24,10 +24,10 @@
             android:name=".media.ui.activity.MediaActivity"
             android:exported="false" />
         <activity
-            android:name=".SearchActivity"
+            android:name=".search.ui.activity.SearchActivity"
             android:exported="false" />
         <activity
-            android:name=".SettingsActivity"
+            android:name=".settings.ui.activity.SettingsActivity"
             android:exported="false" />
         <activity
             android:name=".main.ui.activity.MainActivity"

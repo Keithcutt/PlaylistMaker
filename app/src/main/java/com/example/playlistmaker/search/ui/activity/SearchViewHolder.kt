@@ -1,4 +1,4 @@
-package com.example.playlistmaker
+package com.example.playlistmaker.search.ui.activity
 
 import android.content.Context
 import android.util.TypedValue
@@ -8,9 +8,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
+import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.models.Track
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.example.playlistmaker.search.presentation.mapper.BriefTrackInfoMapper
 
 class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val cover: ImageView = itemView.findViewById(R.id.track_cover)
@@ -18,18 +18,20 @@ class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val artistName: TextView = itemView.findViewById(R.id.artist_name)
     private val trackTime: TextView = itemView.findViewById(R.id.track_time)
 
-    fun bind(model: Track) {
+    fun bind(currentTrack: Track) {
+
+        val track = BriefTrackInfoMapper.map(currentTrack)
 
         Glide.with(itemView)
-            .load(model.artworkUrl100)
+            .load(track.artworkUrl100)
             .centerCrop()
             .transform(RoundedCorners(dpToPx(2.toFloat(), itemView.context)))
             .placeholder(R.drawable.ic_placeholder_35x35)
             .into(cover)
 
-        trackName.text = model.trackName
-        artistName.text = model.artistName
-        trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(model.trackTime)
+        trackName.text = track.trackName
+        artistName.text = track.artistName
+        trackTime.text = track.trackTime
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {

@@ -9,9 +9,8 @@ import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.api.GetSearchTracksUseCase
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.state.SearchScreenState
-import com.example.playlistmaker.search.presentation.utils.SingleEventLiveData
 
-class SearchViewModel : ViewModel() { //Принимать в себя строку (savedInput)
+class SearchViewModel : ViewModel() {
 
     companion object{
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
@@ -19,43 +18,34 @@ class SearchViewModel : ViewModel() { //Принимать в себя стро�
 
     private val sharedPreferences = Creator.provideSharedPreferences()
     private val searchHistoryInteractor = Creator.provideSearchHistoryInteractor(sharedPreferences)
-
     private val getSearchTracksUseCase = Creator.provideGetSearchTracksUseCase()
 
-    private var tracks: MutableList<Track> = mutableListOf() // Сделать LiveData?
+    private var searchQueryText: String? = null
 
     private val handler = Handler(Looper.getMainLooper())
-    private val searchRunnable = Runnable { searchQuery() }
+    private val searchRunnable = Runnable { searchQuery(searchQueryText) }
 
     private val _searchScreenState = MutableLiveData<SearchScreenState>()
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
 
-    private val onTrackClickEvent = SingleEventLiveData<Track>() // Будет открывать плеер для нажатого трека + добавлять трек в историю
+    // Будет открывать плеер для нажатого трека + добавлять трек в историю
+    // private val onTrackClickEvent = SingleEventLiveData<Track>()
 
-    //var savedInput: String? = null
+
 
     private fun searchQuery(expression: String?) {
         if (expression?.isBlank() == false) expression.let {
-            // Loading
-            _searchScreenState.postValue(SearchScreenState.Loading)
+            _searchScreenState.value = SearchScreenState.Loading
 
-            getSearchTracksUseCase.searchTracks(it, object : GetSearchTracksUseCase.TracksConsumer{
+            getSearchTracksUseCase.execute(it, object : GetSearchTracksUseCase.TracksConsumer{
                 override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
-                    handler.post{
-                        if (foundTracks != null) {
-                            // Searched content
-                            tracks.clear()
-                            tracks.addAll(foundTracks)
-                            _searchScreenState.postValue(SearchScreenState.SearchQueryResults(foundTracks.toMutableList()))
-                        }
-                        if (errorMessage != null) {
-                            // noInternet
-                            _searchScreenState.postValue(SearchScreenState.NoInternetError)
-//                            showNoInternetConnectionMessage(true)
-                        } else if (tracks.isEmpty()) {
-                            // NotFound
-                            _searchScreenState.postValue(SearchScreenState.NothingFound)
-                        }
+                    if (foundTracks != null) {
+                        _searchScreenState.postValue(SearchScreenState.SearchQueryResults(foundTracks.toMutableList()))
+                    }
+                    if (errorMessage != null) {
+                        _searchScreenState.postValue(SearchScreenState.NoInternetError)
+                    } else if (foundTracks?.isEmpty() == true) {
+                        _searchScreenState.postValue(SearchScreenState.NothingFound)
                     }
                 }
 
@@ -63,10 +53,37 @@ class SearchViewModel : ViewModel() { //Принимать в себя стро�
         }
     }
 
+    fun repeatSearchQuery() {
+        handler.removeCallbacks(searchRunnable)
+        searchQuery(searchQueryText)
+    }
+
     private fun searchDebounce() {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
 
-    fun click
+    fun clearSearchHistory() {
+        searchHistoryInteractor.clear()
+        _searchScreenState.value = SearchScreenState.EmptyScreen
+    }
+
+    fun onClickEvent(selectedTrack: Track) {
+        searchHistoryInteractor.save(selectedTrack)
+        // Открывать экран плеера (будет добавлено после переработки навигации в приложении)
+    }
+
+    fun onTextChanged(input: String?) {
+        searchQueryText = input
+
+        if (input?.isEmpty() == true) {
+            if (searchHistoryInteractor.isSearchHistoryNotEmpty()) {
+                _searchScreenState.value = SearchScreenState.SearchHistory(searchHistoryInteractor.getSearchHistory())
+            } else {
+                _searchScreenState.value = SearchScreenState.EmptyScreen
+            }
+        } else {
+            searchDebounce()
+        }
+    }
 }

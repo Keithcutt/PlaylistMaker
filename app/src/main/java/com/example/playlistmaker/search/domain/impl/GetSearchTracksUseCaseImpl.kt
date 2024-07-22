@@ -10,7 +10,7 @@ class GetSearchTracksUseCaseImpl(private val repository: TracksRepository) : Get
     private val executor = Executors.newCachedThreadPool()
 
     // Здесь можно было бы пересортировать список треков, отфильтровать, убрав ненужные результаты поиска
-    override fun searchTracks(expression: String, consumer: GetSearchTracksUseCase.TracksConsumer) {
+    override fun execute(expression: String, consumer: GetSearchTracksUseCase.TracksConsumer) {
         executor.execute {
             when(val resource = repository.searchTracks(expression)) {
                 is Resource.Success -> { consumer.consume(resource.value, null) }

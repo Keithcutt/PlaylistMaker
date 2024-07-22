@@ -4,7 +4,7 @@ import com.example.playlistmaker.search.domain.models.Track
 
 interface GetSearchTracksUseCase {
 
-    fun searchTracks(expression: String, consumer: TracksConsumer)
+    fun execute(expression: String, consumer: TracksConsumer)
 
     interface TracksConsumer {
         fun consume(foundTracks: List<Track>?, errorMessage: String?)
