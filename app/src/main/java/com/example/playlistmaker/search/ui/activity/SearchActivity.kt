@@ -77,6 +77,8 @@ class SearchActivity : AppCompatActivity() {
                     viewModel.onTextChanged(TEXT_EMPTY)
                 }
 
+                viewModel.onTextChanged(s?.toString())
+
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -96,6 +98,7 @@ class SearchActivity : AppCompatActivity() {
             if (hasFocus && binding.searchField.text.isEmpty()) {
                 viewModel.onTextChanged(TEXT_EMPTY)
             }
+            viewModel.onTextChanged(binding.searchField.text.toString())
 
         }
 

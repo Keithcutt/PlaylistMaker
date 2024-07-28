@@ -1,51 +1,53 @@
 package com.example.playlistmaker.player.data.repository
 
 import android.media.MediaPlayer
-import com.example.playlistmaker.player.domain.repository.OnPlayerStateChangeListener
 import com.example.playlistmaker.player.domain.models.PlayerState
+import com.example.playlistmaker.player.domain.repository.OnCompletionListener
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
 
 class PlayerRepositoryImpl(private val mediaPlayer: MediaPlayer) : PlayerRepository {
 
     private var playerState = PlayerState.DEFAULT
-    private lateinit var onStateChangeListener : OnPlayerStateChangeListener
+    private lateinit var onCompletionListener : OnCompletionListener
 
     override fun preparePlayer(url: String) {
         mediaPlayer.setDataSource(url)
         mediaPlayer.prepareAsync()
         mediaPlayer.setOnPreparedListener {
-            onStateChangeListener.onChange(playerState)
             playerState = PlayerState.PREPARED
         }
 
         mediaPlayer.setOnCompletionListener {
             playerState = PlayerState.PREPARED
-            onStateChangeListener.onChange(playerState)
+            onCompletionListener.inTheEnd()
         }
     }
 
     override fun startPlayer() {
         mediaPlayer.start()
         playerState = PlayerState.PLAYING
-        onStateChangeListener.onChange(playerState)
     }
 
     override fun pausePlayer() {
         mediaPlayer.pause()
         playerState = PlayerState.PAUSED
-        onStateChangeListener.onChange(playerState)
     }
 
     override fun releasePlayer() {
         mediaPlayer.release()
+        playerState = PlayerState.DEFAULT
     }
 
     override fun getCurrentPosition() : Int {
-        return mediaPlayer.currentPosition
+        return if (playerState == PlayerState.PLAYING || playerState == PlayerState.PAUSED) {
+            mediaPlayer.currentPosition
+        } else {
+            0
+        }
     }
 
-    override fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener) {
-        onStateChangeListener = listener
+    override fun setOnCompletionListener(listener: OnCompletionListener) {
+        onCompletionListener = listener
     }
 
     override fun getPlayerState(): PlayerState {

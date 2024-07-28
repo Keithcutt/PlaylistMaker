@@ -70,6 +70,7 @@ class SearchViewModel : ViewModel() {
 
     fun onClickEvent(selectedTrack: Track) {
         searchHistoryInteractor.save(selectedTrack)
+        // Где-то тут по идее можно добавить обновление адптера у RecyclerView.
         // Открывать экран плеера (будет добавлено после переработки навигации в приложении)
     }
 
@@ -82,6 +83,8 @@ class SearchViewModel : ViewModel() {
             } else {
                 _searchScreenState.value = SearchScreenState.EmptyScreen
             }
+        } else if (input?.isBlank() == true) {
+            _searchScreenState.value = SearchScreenState.EmptyScreen
         } else {
             searchDebounce()
         }

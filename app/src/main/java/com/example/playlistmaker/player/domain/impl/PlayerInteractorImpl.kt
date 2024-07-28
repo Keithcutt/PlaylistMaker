@@ -1,9 +1,9 @@
 package com.example.playlistmaker.player.domain.impl
 
-import com.example.playlistmaker.player.domain.repository.OnPlayerStateChangeListener
 import com.example.playlistmaker.player.domain.models.PlayerState
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
-import com.example.playlistmaker.player.domain.use_case.PlayerInteractor
+import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
+import com.example.playlistmaker.player.domain.repository.OnCompletionListener
 
 class PlayerInteractorImpl(
     private val playerRepository: PlayerRepository
@@ -25,8 +25,8 @@ class PlayerInteractorImpl(
         playerRepository.releasePlayer()
     }
 
-    override fun setOnPlayerStateChangeListener(listener: OnPlayerStateChangeListener) {
-        playerRepository.setOnPlayerStateChangeListener(listener)
+    override fun setOnCompletionListener(listener: OnCompletionListener) {
+        playerRepository.setOnCompletionListener(listener)
     }
 
     override fun getCurrentPosition(): Int {

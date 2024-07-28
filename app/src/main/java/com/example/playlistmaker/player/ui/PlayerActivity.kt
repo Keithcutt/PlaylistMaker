@@ -2,16 +2,17 @@ package com.example.playlistmaker.player.ui
 
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.util.TypedValue
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.player.domain.models.PlayerState
+import com.example.playlistmaker.player.presentation.view_model.PlayerViewModel
+import com.example.playlistmaker.player.presentation.view_model.PlayerViewModelFactory
 import com.example.playlistmaker.search.domain.models.Track
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -24,12 +25,11 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
-
-    private val handler = Handler(Looper.getMainLooper())
-    private val playbackRunnable = { playbackProgressCounter(playerInteractor.getPlayerState()) }
-
-    private val playerInteractor = Creator.providePlayerInteractor()
     private lateinit var currentTrack: Track
+
+    private val viewModel : PlayerViewModel by lazy {
+        ViewModelProvider(this, PlayerViewModelFactory(currentTrack))[PlayerViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,23 +41,22 @@ class PlayerActivity : AppCompatActivity() {
 
         binding.backButton.setOnClickListener { finish() }
 
-        playerInteractor.setOnPlayerStateChangeListener { state -> playbackCases(state) }
-        playerInteractor.preparePlayer(currentTrack.previewUrl)
         binding.playButton.setOnClickListener {
-            playbackControl(playerInteractor.getPlayerState())
+            viewModel.playbackControl()
+        }
+
+        viewModel.playbackState.observe(this) { state ->
+            render(state)
+        }
+
+        viewModel.playbackProgress.observe(this) { progressMillis ->
+            playbackProgressCounter(progressMillis)
         }
     }
 
     override fun onPause() {
         super.onPause()
-        playerInteractor.pausePlayer()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        playerInteractor.releasePlayer()
-
-        handler.removeCallbacks(playbackRunnable)
+        viewModel.pausePlayer()
     }
 
     private fun bindData(model: Track) {
@@ -66,7 +65,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.artistName.text = model.artistName
         binding.genreValue.text = model.primaryGenreName
         binding.countryValue.text = model.country
-        binding.yearValue.text = model.releaseDate // .substringBefore("-") ушло в mapper
+        binding.yearValue.text = model.releaseDate
         binding.albumValue.text = model.collectionName
         binding.durationValue.text = dateFormat.format(model.trackTime)
 
@@ -85,45 +84,33 @@ class PlayerActivity : AppCompatActivity() {
             context.resources.displayMetrics).toInt()
     }
 
-    private fun playbackCases(state: PlayerState) {
-        when(state) {
-            PlayerState.PLAYING -> {
-                binding.playButton.setImageResource(R.drawable.btn_pause)
-                playbackProgressCounter(playerInteractor.getPlayerState())
-            }
-            PlayerState.PAUSED -> {
-                binding.playButton.setImageResource(R.drawable.btn_play)
-                handler.removeCallbacks(playbackRunnable)
-            }
-            PlayerState.PREPARED -> {
-                handler.removeCallbacks(playbackRunnable)
-                binding.playbackProgress.text = getString(R.string.zeroZero)
-                binding.playButton.setImageResource(R.drawable.btn_play)
-            }
-
-            PlayerState.DEFAULT -> {
-                binding.playButton.isEnabled = true
-            }
+    private fun render(state: PlayerState) {
+        when (state) {
+            PlayerState.PLAYING -> onPlaying()
+            PlayerState.PAUSED -> onPaused()
+            PlayerState.PREPARED -> onPrepared()
+            PlayerState.DEFAULT -> onDefault()
         }
     }
 
-    private fun playbackControl(state: PlayerState) {
-        when(state) {
-            PlayerState.PLAYING -> {
-                playerInteractor.pausePlayer()
-            }
-
-            PlayerState.PREPARED, PlayerState.PAUSED -> {
-                playerInteractor.startPlayer()
-            }
-            else -> {}
-        }
+    private fun onPlaying() {
+        binding.playButton.setImageResource(R.drawable.btn_pause)
     }
 
-    private fun playbackProgressCounter(state: PlayerState) {
-        if (state == PlayerState.PLAYING) {
-            binding.playbackProgress.text = dateFormat.format(playerInteractor.getCurrentPosition())
-            handler.postDelayed(playbackRunnable, 300)
-        }
+    private fun onPaused() {
+        binding.playButton.setImageResource(R.drawable.btn_play)
+    }
+
+    private fun onPrepared() {
+        binding.playbackProgress.text = getString(R.string.zeroZero)
+        binding.playButton.setImageResource(R.drawable.btn_play)
+    }
+
+    private fun onDefault() {
+        binding.playButton.isEnabled = true
+    }
+
+    private fun playbackProgressCounter(progressMillis: Int) {
+        binding.playbackProgress.text = dateFormat.format(progressMillis)
     }
 }
