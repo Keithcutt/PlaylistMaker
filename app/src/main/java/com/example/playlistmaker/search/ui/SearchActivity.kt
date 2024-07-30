@@ -1,4 +1,4 @@
-package com.example.playlistmaker.search.ui.activity
+package com.example.playlistmaker.search.ui
 
 import android.content.Context
 import android.content.Intent
@@ -44,11 +44,20 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initializeUI()
+        observeViewModel()
+    }
+
+    private fun initializeUI() {
+        setupListeners()
+        setupSearchField()
+        createSearchAdapter()
+    }
+
+    private fun setupListeners() {
         binding.backButton.setOnClickListener {
             finish()
         }
-
-        createSearchAdapter()
 
         binding.updateButton.setOnClickListener {
             viewModel.repeatSearchQuery()
@@ -63,28 +72,10 @@ class SearchActivity : AppCompatActivity() {
             viewModel.onTextChanged(TEXT_EMPTY)
             hideKeyboard(it)
         }
+    }
 
-        val searchFieldWatcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                if (!s.isNullOrEmpty()) {
-                    viewModel.onTextChanged(s.toString())
-                }
-                binding.clearButton.isVisible = clearButtonVisibility(s)
-
-                if (binding.searchField.hasFocus() && s?.isEmpty() == true) {
-                    viewModel.onTextChanged(TEXT_EMPTY)
-                }
-
-                viewModel.onTextChanged(s?.toString())
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        }
-
-        binding.searchField.addTextChangedListener(searchFieldWatcher)
+    private fun setupSearchField() {
+        binding.searchField.addTextChangedListener(createSearchFieldWatcher())
 
         binding.searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -99,9 +90,46 @@ class SearchActivity : AppCompatActivity() {
                 viewModel.onTextChanged(TEXT_EMPTY)
             }
             viewModel.onTextChanged(binding.searchField.text.toString())
-
         }
+    }
 
+    private fun createSearchFieldWatcher() : TextWatcher {
+        return object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (!s.isNullOrEmpty()) {
+                    viewModel.onTextChanged(s.toString())
+                }
+                binding.clearButton.isVisible = clearButtonVisibility(s)
+
+                if (binding.searchField.hasFocus() && s?.isEmpty() == true) {
+                    viewModel.onTextChanged(TEXT_EMPTY)
+                }
+
+                viewModel.onTextChanged(s?.toString())
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        }
+    }
+
+    private fun createSearchAdapter() {
+        searchAdapter = SearchAdapter {
+            viewModel.onClickEvent(it) // либо так - viewModel::onClickEvent
+            startPlayerActivity(it) // сюда можно передавать синглтон-объект из PlayerActivity, который будет ее запускать
+        }
+    }
+
+    private fun startPlayerActivity(track: Track) {
+        if (clickDebounce()) {
+            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+            playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
+            startActivity(playerIntent)
+        }
+    }
+
+    private fun observeViewModel() {
         viewModel.searchScreenState.observe(this) { state ->
             render(state)
         }
@@ -187,20 +215,5 @@ class SearchActivity : AppCompatActivity() {
         binding.placeholderNoInternet.isVisible = false
         binding.rvSearch.isVisible = false
         binding.progressBar.isVisible = false
-    }
-
-    private fun startPlayerActivity(track: Track) {
-        if (clickDebounce()) {
-            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
-            playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
-            startActivity(playerIntent)
-        }
-    }
-
-    private fun createSearchAdapter() {
-        searchAdapter = SearchAdapter {
-            viewModel.onClickEvent(it) // либо так - viewModel::onClickEvent
-            startPlayerActivity(it) // сюда можно передавать синглтон-объект из PlayerActivity, который будет ее запускать
-        }
     }
 }

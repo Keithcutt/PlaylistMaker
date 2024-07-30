@@ -9,12 +9,13 @@ import com.example.playlistmaker.creator.Creator
 
 class App : Application() {
 
-    private companion object {
+    companion object {
         private const val DARK_THEME = "key_for_theme_switcher"
     }
 
     private var darkTheme = false
     private lateinit var sharedPreferences : SharedPreferences
+
 
     override fun onCreate() {
         super.onCreate()
@@ -27,10 +28,9 @@ class App : Application() {
                 DARK_THEME,
                 resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)
         )
-
     }
 
-    fun switchTheme(darkThemeEnabled: Boolean) {
+    private fun switchTheme(darkThemeEnabled: Boolean) {
         darkTheme = darkThemeEnabled
 
         sharedPreferences.edit()
@@ -45,6 +45,4 @@ class App : Application() {
             }
         )
     }
-
-    fun isDarkThemeEnabled() = darkTheme
 }

@@ -70,7 +70,7 @@ class SearchViewModel : ViewModel() {
 
     fun onClickEvent(selectedTrack: Track) {
         searchHistoryInteractor.save(selectedTrack)
-        // Где-то тут по идее можно добавить обновление адптера у RecyclerView.
+        // Где-то тут по идее можно добавить обновление адптера у RecyclerView с историей.
         // Открывать экран плеера (будет добавлено после переработки навигации в приложении)
     }
 

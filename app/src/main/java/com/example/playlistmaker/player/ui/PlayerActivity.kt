@@ -10,7 +10,7 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.player.domain.models.PlayerState
+import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModel
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModelFactory
 import com.example.playlistmaker.search.domain.models.Track
@@ -25,6 +25,7 @@ class PlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityPlayerBinding
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
+
     private lateinit var currentTrack: Track
 
     private val viewModel : PlayerViewModel by lazy {
@@ -39,19 +40,8 @@ class PlayerActivity : AppCompatActivity() {
         currentTrack = Creator.provideCurrentTrack(intent)
         bindData(currentTrack)
 
-        binding.backButton.setOnClickListener { finish() }
-
-        binding.playButton.setOnClickListener {
-            viewModel.playbackControl()
-        }
-
-        viewModel.playbackState.observe(this) { state ->
-            render(state)
-        }
-
-        viewModel.playbackProgress.observe(this) { progressMillis ->
-            playbackProgressCounter(progressMillis)
-        }
+        setupListeners()
+        observeViewModel()
     }
 
     override fun onPause() {
@@ -82,6 +72,24 @@ class PlayerActivity : AppCompatActivity() {
             TypedValue.COMPLEX_UNIT_DIP,
             dp,
             context.resources.displayMetrics).toInt()
+    }
+
+    private fun setupListeners() {
+        binding.backButton.setOnClickListener { finish() }
+
+        binding.playButton.setOnClickListener {
+            viewModel.playbackControl()
+        }
+    }
+
+    private fun observeViewModel() {
+        viewModel.playbackState.observe(this) { state ->
+            render(state)
+        }
+
+        viewModel.playbackProgress.observe(this) { progressMillis ->
+            playbackProgressCounter(progressMillis)
+        }
     }
 
     private fun render(state: PlayerState) {

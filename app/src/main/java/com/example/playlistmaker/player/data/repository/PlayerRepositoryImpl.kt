@@ -1,7 +1,7 @@
 package com.example.playlistmaker.player.data.repository
 
 import android.media.MediaPlayer
-import com.example.playlistmaker.player.domain.models.PlayerState
+import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.player.domain.repository.OnCompletionListener
 import com.example.playlistmaker.player.domain.repository.PlayerRepository
 

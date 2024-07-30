@@ -20,6 +20,10 @@ import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.search.domain.impl.SearchHistoryInteractorImpl
 import com.example.playlistmaker.search.domain.impl.GetSearchTracksUseCaseImpl
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.settings.data.impl.SettingsRepositoryImpl
+import com.example.playlistmaker.settings.data.repository.SettingsRepository
+import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
+import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
 import com.google.gson.Gson
 
 object Creator {
@@ -64,5 +68,13 @@ object Creator {
 
     private fun provideSearchHistoryRepository(sp: SharedPreferences): SearchHistoryRepository {
         return SearchHistoryRepositoryImpl(sp)
+    }
+
+    fun provideSettingsInteractor(sp: SharedPreferences): SettingsInteractor { //
+        return SettingsInteractorImpl(provideSettingsRepository(sp)) // sp
+    }
+
+    private fun provideSettingsRepository(sp: SharedPreferences): SettingsRepository { //
+        return SettingsRepositoryImpl(sp) //
     }
 }

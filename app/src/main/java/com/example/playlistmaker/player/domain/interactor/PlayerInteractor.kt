@@ -1,6 +1,6 @@
 package com.example.playlistmaker.player.domain.interactor
 
-import com.example.playlistmaker.player.domain.models.PlayerState
+import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.player.domain.repository.OnCompletionListener
 
 interface PlayerInteractor {

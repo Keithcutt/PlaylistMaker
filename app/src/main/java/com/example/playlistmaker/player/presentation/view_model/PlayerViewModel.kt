@@ -5,7 +5,7 @@ import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.playlistmaker.creator.Creator
-import com.example.playlistmaker.player.domain.models.PlayerState
+import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 
 class PlayerViewModel(currentTrack: Track) : ViewModel() {
