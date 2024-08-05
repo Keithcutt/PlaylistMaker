@@ -116,8 +116,8 @@ class SearchActivity : AppCompatActivity() {
 
     private fun createSearchAdapter() {
         searchAdapter = SearchAdapter {
-            viewModel.onClickEvent(it) // либо так - viewModel::onClickEvent
-            startPlayerActivity(it) // сюда можно передавать синглтон-объект из PlayerActivity, который будет ее запускать
+            viewModel.onClickEvent(it)
+            startPlayerActivity(it)
         }
     }
 

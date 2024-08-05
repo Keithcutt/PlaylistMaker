@@ -19,7 +19,7 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
         val response = networkClient.doRequest(TrackSearchRequest(expression))
 
         return when (response.resultCode) {
-            NO_INTERNET_CONNECTION -> Resource.Error("Отсутствует подключение к интернету") // Убрать
+            NO_INTERNET_CONNECTION -> Resource.Error("No internet connection")
 
             SUCCESSFUL_RESPONSE -> Resource.Success((response as TrackSearchResponse).results.map {
                     TrackMapper.map(it)
@@ -27,7 +27,7 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
             )
 
             else -> {
-                Resource.Error("Internal server error") // Убрать
+                Resource.Error("Internal server error")
             }
         }
     }

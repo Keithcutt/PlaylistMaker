@@ -28,8 +28,6 @@ class SearchViewModel : ViewModel() {
     private val _searchScreenState = MutableLiveData<SearchScreenState>()
     val searchScreenState: LiveData<SearchScreenState> = _searchScreenState
 
-    // Будет открывать плеер для нажатого трека + добавлять трек в историю
-    // private val onTrackClickEvent = SingleEventLiveData<Track>()
 
 
 
@@ -58,7 +56,7 @@ class SearchViewModel : ViewModel() {
         searchQuery(searchQueryText)
     }
 
-    private fun searchDebounce() {
+    private fun executeSearchWithDebounce() {
         handler.removeCallbacks(searchRunnable)
         handler.postDelayed(searchRunnable, SEARCH_DEBOUNCE_DELAY)
     }
@@ -70,8 +68,6 @@ class SearchViewModel : ViewModel() {
 
     fun onClickEvent(selectedTrack: Track) {
         searchHistoryInteractor.save(selectedTrack)
-        // Где-то тут по идее можно добавить обновление адптера у RecyclerView с историей.
-        // Открывать экран плеера (будет добавлено после переработки навигации в приложении)
     }
 
     fun onTextChanged(input: String?) {
@@ -86,7 +82,7 @@ class SearchViewModel : ViewModel() {
         } else if (input?.isBlank() == true) {
             _searchScreenState.value = SearchScreenState.EmptyScreen
         } else {
-            searchDebounce()
+            executeSearchWithDebounce()
         }
     }
 }
