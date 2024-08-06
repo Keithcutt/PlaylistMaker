@@ -10,7 +10,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.models.Track
-import com.example.playlistmaker.search.presentation.mapper.BriefTrackInfoMapper
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val cover: ImageView = itemView.findViewById(R.id.track_cover)
@@ -20,18 +21,16 @@ class SearchViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
     fun bind(currentTrack: Track) {
 
-        val track = BriefTrackInfoMapper.map(currentTrack)
-
         Glide.with(itemView)
-            .load(track.artworkUrl100)
+            .load(currentTrack.artworkUrl100)
             .centerCrop()
             .transform(RoundedCorners(dpToPx(2.toFloat(), itemView.context)))
             .placeholder(R.drawable.ic_placeholder_35x35)
             .into(cover)
 
-        trackName.text = track.trackName
-        artistName.text = track.artistName
-        trackTime.text = track.trackTime
+        trackName.text = currentTrack.trackName
+        artistName.text = currentTrack.artistName
+        trackTime.text = SimpleDateFormat("mm:ss", Locale.getDefault()).format(currentTrack.trackTime)
     }
 
     private fun dpToPx(dp: Float, context: Context): Int {

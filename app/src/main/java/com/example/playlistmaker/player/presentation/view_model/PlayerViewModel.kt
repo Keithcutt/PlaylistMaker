@@ -35,6 +35,7 @@ class PlayerViewModel(currentTrack: Track) : ViewModel() {
 
     fun pausePlayer() {
         playerInteractor.pausePlayer()
+        _playbackState.value = PlayerState.PAUSED
         handler.removeCallbacks(playbackRunnable)
     }
 
@@ -46,10 +47,16 @@ class PlayerViewModel(currentTrack: Track) : ViewModel() {
                 handler.removeCallbacks(playbackRunnable)
             }
 
-            PlayerState.PREPARED, PlayerState.PAUSED -> {
+            PlayerState.PREPARED -> {
                 playerInteractor.startPlayer()
                 playbackProgressCounter()
                 _playbackProgress.value = 0
+                _playbackState.value = PlayerState.PLAYING
+            }
+
+            PlayerState.PAUSED -> {
+                playerInteractor.startPlayer()
+                playbackProgressCounter()
                 _playbackState.value = PlayerState.PLAYING
             }
             else -> {}

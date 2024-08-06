@@ -21,10 +21,10 @@ import com.example.playlistmaker.search.domain.impl.GetSearchTracksUseCaseImpl
 import com.example.playlistmaker.search.domain.impl.SearchHistoryInteractorImpl
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.settings.data.impl.SettingsRepositoryImpl
-import com.example.playlistmaker.settings.data.repository.SettingsRepository
+import com.example.playlistmaker.settings.domain.repository.SettingsRepository
 import com.example.playlistmaker.settings.domain.impl.SettingsInteractorImpl
 import com.example.playlistmaker.settings.domain.interactor.SettingsInteractor
-import com.example.playlistmaker.sharing.data.ExternalNavigator
+import com.example.playlistmaker.sharing.domain.navigator.ExternalNavigator
 import com.example.playlistmaker.sharing.data.impl.ExternalNavigatorImpl
 import com.example.playlistmaker.sharing.domain.impl.SharingInteractorImpl
 import com.example.playlistmaker.sharing.domain.interactor.SharingInteractor

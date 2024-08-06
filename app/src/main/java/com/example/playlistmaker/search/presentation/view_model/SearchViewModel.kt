@@ -38,7 +38,7 @@ class SearchViewModel : ViewModel() {
             getSearchTracksUseCase.execute(it, object : GetSearchTracksUseCase.TracksConsumer{
                 override fun consume(foundTracks: List<Track>?, errorMessage: String?) {
                     if (foundTracks != null) {
-                        _searchScreenState.postValue(SearchScreenState.SearchQueryResults(foundTracks.toMutableList()))
+                        _searchScreenState.postValue(SearchScreenState.SearchQueryResults(foundTracks))
                     }
                     if (errorMessage != null) {
                         _searchScreenState.postValue(SearchScreenState.NoInternetError)

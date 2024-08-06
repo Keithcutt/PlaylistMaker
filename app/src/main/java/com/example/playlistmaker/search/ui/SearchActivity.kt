@@ -189,7 +189,7 @@ class SearchActivity : AppCompatActivity() {
         binding.placeholderNotFound.isVisible = true
     }
 
-    private fun showSearchQueryResults(foundTracks: MutableList<Track>) {
+    private fun showSearchQueryResults(foundTracks: List<Track>) {
         binding.placeholderNoInternet.isVisible = false
         binding.placeholderNotFound.isVisible = false
         binding.progressBar.isVisible = false
@@ -199,7 +199,7 @@ class SearchActivity : AppCompatActivity() {
         binding.rvSearch.adapter = searchAdapter
     }
 
-    private fun showSearchHistory(searchedTracks: MutableList<Track>) {
+    private fun showSearchHistory(searchedTracks: List<Track>) {
         binding.placeholderNoInternet.isVisible = false
         binding.placeholderNotFound.isVisible = false
         binding.progressBar.isVisible = false
