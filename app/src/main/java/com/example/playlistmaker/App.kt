@@ -4,13 +4,20 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.player.di.playerModule
+import com.example.playlistmaker.search.di.searchModule
+import com.example.playlistmaker.settings.di.settingsModule
+import com.example.playlistmaker.sharing.di.sharingModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.GlobalContext.startKoin
 
 
-class App : Application() {
+class App() : Application() {
 
     companion object {
         private const val DARK_THEME = "key_for_theme_switcher"
+        private const val PLAYLISTMAKER_PREFERENCES = "playlistmaker_preferences"
+
     }
 
     private var darkTheme = false
@@ -20,9 +27,12 @@ class App : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        Creator.initApplication(this)
+        startKoin {
+            androidContext(this@App)
+            modules(playerModule, searchModule, settingsModule, sharingModule)
+        }
 
-        sharedPreferences = Creator.provideSharedPreferences()
+        sharedPreferences = getSharedPreferences(PLAYLISTMAKER_PREFERENCES, MODE_PRIVATE)
         switchTheme(
             sharedPreferences.getBoolean(
                 DARK_THEME,
