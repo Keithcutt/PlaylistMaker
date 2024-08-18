@@ -4,13 +4,12 @@ import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.creator.Creator
+import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
 
-class PlayerViewModel(currentTrack: Track) : ViewModel() {
 
-    private val playerInteractor = Creator.providePlayerInteractor()
+class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerInteractor) : ViewModel() {
 
     private val handler = Handler(Looper.getMainLooper())
     private val playbackRunnable = { playbackProgressCounter() }

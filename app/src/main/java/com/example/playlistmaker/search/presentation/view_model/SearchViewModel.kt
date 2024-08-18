@@ -5,20 +5,17 @@ import android.os.Looper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.search.domain.api.GetSearchTracksUseCase
+import com.example.playlistmaker.search.domain.api.SearchHistoryInteractor
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.state.SearchScreenState
 
-class SearchViewModel : ViewModel() {
+class SearchViewModel(private val searchHistoryInteractor: SearchHistoryInteractor,
+                      private val getSearchTracksUseCase: GetSearchTracksUseCase) : ViewModel() {
 
     companion object{
         private const val SEARCH_DEBOUNCE_DELAY = 2000L
     }
-
-    private val sharedPreferences = Creator.provideSharedPreferences()
-    private val searchHistoryInteractor = Creator.provideSearchHistoryInteractor(sharedPreferences)
-    private val getSearchTracksUseCase = Creator.provideGetSearchTracksUseCase()
 
     private var searchQueryText: String? = null
 

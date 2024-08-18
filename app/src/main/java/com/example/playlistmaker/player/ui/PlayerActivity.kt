@@ -4,16 +4,17 @@ import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
-import com.example.playlistmaker.creator.Creator
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
 import com.example.playlistmaker.player.domain.state.PlayerState
+import com.example.playlistmaker.player.presentation.mapper.TrackMapper
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModel
-import com.example.playlistmaker.player.presentation.view_model.PlayerViewModelFactory
 import com.example.playlistmaker.search.domain.models.Track
+import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -27,17 +28,16 @@ class PlayerActivity : AppCompatActivity() {
     private val dateFormat by lazy { SimpleDateFormat("mm:ss", Locale.getDefault()) }
 
     private lateinit var currentTrack: Track
+    private val trackMapper: TrackMapper by inject()
 
-    private val viewModel : PlayerViewModel by lazy {
-        ViewModelProvider(this, PlayerViewModelFactory(currentTrack))[PlayerViewModel::class.java]
-    }
+    private val viewModel: PlayerViewModel by viewModel { parametersOf(currentTrack) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        currentTrack = Creator.provideCurrentTrack(intent)
+        currentTrack = trackMapper.getFromIntent(intent)
         bindData(currentTrack)
 
         setupListeners()
