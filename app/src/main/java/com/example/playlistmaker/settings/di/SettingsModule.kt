@@ -20,7 +20,8 @@ val settingsModule = module {
     }
 
     single<SettingsRepository> { SettingsRepositoryImpl(get()) }
-    single<SettingsInteractor> { SettingsInteractorImpl(get()) }
+
+    factory<SettingsInteractor> { SettingsInteractorImpl(get()) }
 
     viewModel{
         SettingsViewModel(get(), get())

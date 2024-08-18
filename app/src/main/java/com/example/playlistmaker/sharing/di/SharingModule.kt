@@ -10,5 +10,5 @@ import org.koin.dsl.module
 val sharingModule = module {
 
     single<ExternalNavigator> { ExternalNavigatorImpl(androidApplication()) }
-    single<SharingInteractor> { SharingInteractorImpl(get()) }
+    factory<SharingInteractor> { SharingInteractorImpl(get()) }
 }

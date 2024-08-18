@@ -12,7 +12,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.GlobalContext.startKoin
 
 
-class App() : Application() {
+class App : Application() {
 
     companion object {
         private const val DARK_THEME = "key_for_theme_switcher"

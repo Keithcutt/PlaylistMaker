@@ -4,7 +4,7 @@ import android.content.Intent
 import com.example.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
 
-class TrackMapper {
+class TrackMapper(private val gson: Gson) {
 
     companion object {
         private const val TRACK_KEY = "track"
@@ -12,6 +12,6 @@ class TrackMapper {
 
     fun getFromIntent(intent: Intent): Track {
         val json = intent.getStringExtra(TRACK_KEY)
-        return Gson().fromJson(json, Track::class.java)
+        return gson.fromJson(json, Track::class.java)
     }
 }

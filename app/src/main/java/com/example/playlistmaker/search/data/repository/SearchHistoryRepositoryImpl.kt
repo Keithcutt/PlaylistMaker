@@ -5,7 +5,7 @@ import com.example.playlistmaker.search.domain.api.SearchHistoryRepository
 import com.example.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
 
-class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences) : SearchHistoryRepository {
+class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences, private val gson: Gson) : SearchHistoryRepository {
     companion object {
         const val SEARCHED_TRACKS_KEY = "searched_tracks"
         const val EMPTY_STRING = ""
@@ -53,10 +53,10 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
 
     override fun isSearchHistoryNotEmpty(): Boolean = searchedTracks.isNotEmpty()
     private fun createJsonFromTracks(tracks: MutableList<Track>): String {
-        return Gson().toJson(tracks)
+        return gson.toJson(tracks)
     }
 
     private fun createTracksFromJson(json: String): Array<Track> {
-        return Gson().fromJson(json, Array<Track>::class.java)
+        return gson.fromJson(json, Array<Track>::class.java)
     }
 }
