@@ -17,6 +17,22 @@ class MediaActivity : AppCompatActivity() {
         binding = ActivityMediaBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        setupListeners()
+        setupViewPager()
+    }
+
+    override fun onDestroy() {
+        tabMediator.detach()
+        super.onDestroy()
+    }
+
+    private fun setupListeners() {
+        binding.backBtn.setOnClickListener {
+            finish()
+        }
+    }
+
+    private fun setupViewPager() {
         binding.viewPager.adapter = MediaViewPagerAdapter(supportFragmentManager, lifecycle)
 
         tabMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
@@ -27,14 +43,5 @@ class MediaActivity : AppCompatActivity() {
         }
 
         tabMediator.attach()
-
-        binding.backBtn.setOnClickListener {
-            finish()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        tabMediator.detach()
     }
 }
