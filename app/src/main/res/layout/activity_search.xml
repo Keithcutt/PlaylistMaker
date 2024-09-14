@@ -91,7 +91,7 @@
             android:src="@drawable/placeholder_not_found" />
 
         <TextView
-            style="@style/SearchActivityMessages"
+            style="@style/Message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/not_found" />
@@ -112,7 +112,7 @@
             android:src="@drawable/placeholder_no_internet" />
 
         <TextView
-            style="@style/SearchActivityMessages"
+            style="@style/Message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_16"
@@ -122,7 +122,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/update_button"
-            style="@style/SearchActivityButtons"
+            style="@style/PillShapeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/update"
@@ -139,7 +139,7 @@
         android:visibility="gone">
 
         <TextView
-            style="@style/SearchActivityMessages"
+            style="@style/Message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/dp_20"
@@ -157,7 +157,7 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/clear_history_button"
-            style="@style/SearchActivityButtons"
+            style="@style/PillShapeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"

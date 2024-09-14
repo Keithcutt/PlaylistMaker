@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.SharedPreferences
 import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
+import com.example.playlistmaker.media.di.favouritesModule
+import com.example.playlistmaker.media.di.playlistsModule
 import com.example.playlistmaker.player.di.playerModule
 import com.example.playlistmaker.search.di.searchModule
 import com.example.playlistmaker.settings.di.settingsModule
@@ -21,7 +23,7 @@ class App : Application() {
     }
 
     private var darkTheme = false
-    private lateinit var sharedPreferences : SharedPreferences
+    private lateinit var sharedPreferences: SharedPreferences
 
 
     override fun onCreate() {
@@ -29,14 +31,22 @@ class App : Application() {
 
         startKoin {
             androidContext(this@App)
-            modules(playerModule, searchModule, settingsModule, sharingModule)
+            modules(
+                playerModule,
+                searchModule,
+                settingsModule,
+                sharingModule,
+                favouritesModule,
+                playlistsModule
+            )
         }
 
         sharedPreferences = getSharedPreferences(PLAYLISTMAKER_PREFERENCES, MODE_PRIVATE)
         switchTheme(
             sharedPreferences.getBoolean(
                 DARK_THEME,
-                resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES)
+                resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK == Configuration.UI_MODE_NIGHT_YES
+            )
         )
     }
 

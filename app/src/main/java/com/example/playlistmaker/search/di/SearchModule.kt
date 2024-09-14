@@ -34,8 +34,7 @@ val searchModule = module {
     single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(), get()) }
     single<TracksRepository> { TracksRepositoryImpl(get()) }
 
-
-    factory<ITunesApiService> {
+    single<ITunesApiService> {
         Retrofit.Builder()
             .baseUrl("https://itunes.apple.com")
             .addConverterFactory(GsonConverterFactory.create())
@@ -43,8 +42,10 @@ val searchModule = module {
             .create(ITunesApiService::class.java)
     }
 
-    factory { Gson() }
-    factory<NetworkClient> { RetrofitNetworkClient(get(), get()) }
+    single { Gson() }
+    single<NetworkClient> { RetrofitNetworkClient(get(), get()) }
+
+
     factory<SearchHistoryInteractor> { SearchHistoryInteractorImpl(get()) }
     factory<GetSearchTracksUseCase> { GetSearchTracksUseCaseImpl(get()) }
 
