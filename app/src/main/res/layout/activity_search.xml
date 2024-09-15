@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:background="?attr/colorOnPrimary"
+    android:orientation="vertical"
     tools:context=".search.ui.SearchActivity">
 
     <LinearLayout
@@ -19,8 +19,7 @@
             android:id="@+id/back_button"
             style="@style/HeaderBackButton"
             android:layout_width="@dimen/dp_48"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_arrow_back" />
+            android:layout_height="wrap_content" />
 
         <TextView
             style="@style/Title"
@@ -91,7 +90,7 @@
             android:src="@drawable/placeholder_not_found" />
 
         <TextView
-            style="@style/SearchActivityMessages"
+            style="@style/Message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/not_found" />
@@ -112,7 +111,7 @@
             android:src="@drawable/placeholder_no_internet" />
 
         <TextView
-            style="@style/SearchActivityMessages"
+            style="@style/Message"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/dp_16"
@@ -122,11 +121,10 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/update_button"
-            style="@style/SearchActivityButtons"
+            style="@style/PillShapeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/update"
-            app:cornerRadius="@dimen/dp_52" />
+            android:text="@string/update" />
     </LinearLayout>
 
     <LinearLayout
@@ -139,7 +137,7 @@
         android:visibility="gone">
 
         <TextView
-            style="@style/SearchActivityMessages"
+            style="@style/Message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/dp_20"
@@ -157,13 +155,12 @@
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/clear_history_button"
-            style="@style/SearchActivityButtons"
+            style="@style/PillShapeButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginVertical="@dimen/dp_24"
-            android:text="@string/clear_history"
-            app:cornerRadius="@dimen/dp_52" />
+            android:text="@string/clear_history" />
     </LinearLayout>
 
     <ProgressBar

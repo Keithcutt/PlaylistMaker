@@ -14,6 +14,7 @@
         <item name="android:outlineSpotShadowColor">?attr/colorOnPrimary</item>
         <item name="android:padding">@dimen/dp_12</item>
         <item name="cornerRadius">0dp</item>
+        <item name="icon">@drawable/ic_arrow_back</item>
         <item name="iconSize">@dimen/dp_24</item>
         <item name="iconTint">?attr/colorOnSecondary</item>
     </style>
@@ -63,17 +64,18 @@
         <item name="android:textSize">@dimen/sp_12</item>
     </style>
 
-    <style name="SearchActivityMessages">
+    <style name="Message">
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
         <item name="android:textSize">@dimen/sp_20</item>
     </style>
 
-    <style name="SearchActivityButtons">
+    <style name="PillShapeButton">
         <item name="android:backgroundTint">?attr/colorOnSecondary</item>
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:textSize">@dimen/sp_16</item>
+        <item name="cornerRadius">@dimen/dp_52</item>
     </style>
 
     <style name="SearchBar">
@@ -107,7 +109,7 @@
         <item name="android:textFontWeight">500</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>
-    
+
     <style name="PlayerTrackAndArtist">
         <item name="android:fontFamily">@font/ys_display_medium</item>
         <item name="android:textColor">?attr/colorOnSecondary</item>
@@ -115,4 +117,9 @@
         <item name="android:lines">1</item>
     </style>
 
+    <style name="TabLayout">
+        <item name="android:background">?attr/colorOnPrimary</item>
+        <item name="tabIndicatorColor">?attr/colorOnSecondary</item>
+        <item name="tabTextColor">?attr/colorOnSecondary</item>
+    </style>
 </resources>

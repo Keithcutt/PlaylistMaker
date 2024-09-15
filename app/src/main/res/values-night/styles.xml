@@ -15,6 +15,7 @@
         <item name="android:outlineSpotShadowColor">?attr/colorOnPrimary</item>
         <item name="android:padding">@dimen/dp_12</item>
         <item name="cornerRadius">0dp</item>
+        <item name="icon">@drawable/ic_arrow_back</item>
         <item name="iconSize">@dimen/dp_24</item>
         <item name="iconTint">?attr/colorOnSecondary</item>
     </style>
