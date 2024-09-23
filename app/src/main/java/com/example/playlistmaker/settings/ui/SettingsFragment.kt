@@ -1,36 +1,39 @@
 package com.example.playlistmaker.settings.ui
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
-import com.example.playlistmaker.databinding.ActivitySettingsBinding
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.example.playlistmaker.databinding.FragmentSettingsBinding
+import com.example.playlistmaker.main.ui.activity.BindingFragment
 import com.example.playlistmaker.settings.presentation.view_model.SettingsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
+class SettingsFragment : BindingFragment<FragmentSettingsBinding>() {
 
-class SettingsActivity : AppCompatActivity() {
-
-    private lateinit var binding: ActivitySettingsBinding
     private val viewModel: SettingsViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySettingsBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentSettingsBinding {
+        return FragmentSettingsBinding.inflate(inflater, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         setupListeners()
         observeViewModel()
     }
 
     private fun setupListeners() {
-        binding.backBtn.setOnClickListener {
-            finish()
-        }
 
         binding.themeSwitcher.setOnCheckedChangeListener { _, checked ->
             viewModel.setThemeSettings(checked)
         }
 
-        binding.shareBtn.setOnClickListener{
+        binding.shareBtn.setOnClickListener {
             viewModel.onShareButtonClick()
         }
 
@@ -44,7 +47,7 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun observeViewModel() {
-        viewModel.themeSwitcherState.observe(this) {themeSettings ->
+        viewModel.themeSwitcherState.observe(viewLifecycleOwner) { themeSettings ->
             binding.themeSwitcher.isChecked = themeSettings.isDarkThemeEnabled
         }
     }

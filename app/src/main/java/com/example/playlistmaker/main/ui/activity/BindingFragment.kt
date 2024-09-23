@@ -1,4 +1,4 @@
-package com.example.playlistmaker.media.ui.fragments
+package com.example.playlistmaker.main.ui.activity
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 
-abstract class BindingFragment<T: ViewBinding> : Fragment() {
+abstract class BindingFragment<T : ViewBinding> : Fragment() {
 
     private var _binding: T? = null
     protected val binding get() = _binding!!
@@ -24,7 +24,7 @@ abstract class BindingFragment<T: ViewBinding> : Fragment() {
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         _binding = null
+        super.onDestroyView()
     }
 }

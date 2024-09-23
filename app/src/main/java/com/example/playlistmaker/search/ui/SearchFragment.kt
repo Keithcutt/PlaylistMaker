@@ -1,18 +1,20 @@
 package com.example.playlistmaker.search.ui
 
-import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
-import com.example.playlistmaker.databinding.ActivitySearchBinding
+import com.example.playlistmaker.databinding.FragmentSearchBinding
+import com.example.playlistmaker.main.ui.activity.BindingFragment
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.state.SearchScreenState
@@ -20,7 +22,7 @@ import com.example.playlistmaker.search.presentation.view_model.SearchViewModel
 import com.google.gson.Gson
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class SearchActivity : AppCompatActivity() {
+class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
     companion object {
         private const val TEXT_EMPTY = ""
@@ -28,20 +30,30 @@ class SearchActivity : AppCompatActivity() {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
-    private lateinit var binding: ActivitySearchBinding
     private lateinit var searchAdapter: SearchAdapter
+    private lateinit var textWatcher: TextWatcher
     private var isClickAllowed = true
     private val handler = Handler(Looper.getMainLooper())
 
     private val viewModel: SearchViewModel by viewModel()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySearchBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun createBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentSearchBinding {
+        return FragmentSearchBinding.inflate(layoutInflater, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         initializeUI()
         observeViewModel()
+    }
+
+    override fun onDestroyView() {
+        textWatcher.let { binding.searchField.removeTextChangedListener(it) }
+        super.onDestroyView()
     }
 
     private fun initializeUI() {
@@ -51,15 +63,12 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        binding.backButton.setOnClickListener {
-            finish()
-        }
 
         binding.updateButton.setOnClickListener {
             viewModel.repeatSearchQuery()
         }
 
-        binding.clearHistoryButton.setOnClickListener{
+        binding.clearHistoryButton.setOnClickListener {
             viewModel.clearSearchHistory()
         }
 
@@ -71,7 +80,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun setupSearchField() {
-        binding.searchField.addTextChangedListener(createSearchFieldWatcher())
+        textWatcher = createSearchFieldWatcher()
+        binding.searchField.addTextChangedListener(textWatcher)
 
         binding.searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -80,7 +90,7 @@ class SearchActivity : AppCompatActivity() {
             false
         }
 
-        binding.searchField.setOnFocusChangeListener {_, hasFocus ->
+        binding.searchField.setOnFocusChangeListener { _, hasFocus ->
 
             if (hasFocus && binding.searchField.text.isEmpty()) {
                 viewModel.onTextChanged(TEXT_EMPTY)
@@ -89,7 +99,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
-    private fun createSearchFieldWatcher() : TextWatcher {
+    private fun createSearchFieldWatcher(): TextWatcher {
         return object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -119,14 +129,14 @@ class SearchActivity : AppCompatActivity() {
 
     private fun startPlayerActivity(track: Track) {
         if (clickDebounce()) {
-            val playerIntent = Intent(this@SearchActivity, PlayerActivity::class.java)
+            val playerIntent = Intent(requireContext(), PlayerActivity::class.java)
             playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
             startActivity(playerIntent)
         }
     }
 
     private fun observeViewModel() {
-        viewModel.searchScreenState.observe(this) { state ->
+        viewModel.searchScreenState.observe(viewLifecycleOwner) { state ->
             render(state)
         }
     }
@@ -136,8 +146,8 @@ class SearchActivity : AppCompatActivity() {
     }
 
     private fun hideKeyboard(view: View) {
-        val inputMethodManager =
-            getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+        val inputMethodManager: InputMethodManager? =
+            requireContext().getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager //?????
         inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
@@ -145,12 +155,12 @@ class SearchActivity : AppCompatActivity() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed( { isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
         }
         return current
     }
 
-    private fun render(state: SearchScreenState){
+    private fun render(state: SearchScreenState) {
         when (state) {
             is SearchScreenState.Loading -> showLoading()
             is SearchScreenState.NoInternetError -> showNoInternetMessage()
