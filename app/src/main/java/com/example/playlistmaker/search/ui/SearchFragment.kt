@@ -30,12 +30,21 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         private const val CLICK_DEBOUNCE_DELAY = 1000L
     }
 
-    private lateinit var searchAdapter: SearchAdapter
-    private lateinit var textWatcher: TextWatcher
-    private var isClickAllowed = true
-    private val handler = Handler(Looper.getMainLooper())
-
     private val viewModel: SearchViewModel by viewModel()
+    private val handler = Handler(Looper.getMainLooper())
+    private var isClickAllowed = true
+
+    private val searchAdapter: SearchAdapter by lazy {
+        SearchAdapter {
+            viewModel.onClickEvent(it)
+            startPlayerActivity(it)
+        }
+    }
+
+    private val textWatcher: TextWatcher by lazy {
+        createSearchFieldWatcher()
+    }
+
 
     override fun createBinding(
         inflater: LayoutInflater,
@@ -59,7 +68,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     private fun initializeUI() {
         setupListeners()
         setupSearchField()
-        createSearchAdapter()
     }
 
     private fun setupListeners() {
@@ -80,7 +88,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     }
 
     private fun setupSearchField() {
-        textWatcher = createSearchFieldWatcher()
         binding.searchField.addTextChangedListener(textWatcher)
 
         binding.searchField.setOnEditorActionListener { _, actionId, _ ->
@@ -117,13 +124,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
             }
 
             override fun afterTextChanged(s: Editable?) {}
-        }
-    }
-
-    private fun createSearchAdapter() {
-        searchAdapter = SearchAdapter {
-            viewModel.onClickEvent(it)
-            startPlayerActivity(it)
         }
     }
 

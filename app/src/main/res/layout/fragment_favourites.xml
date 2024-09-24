@@ -12,7 +12,7 @@
         android:id="@+id/placeholder_not_found"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/dp_208"
+        android:layout_marginTop="@dimen/dp_104"
         android:gravity="center_horizontal"
         android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent">
