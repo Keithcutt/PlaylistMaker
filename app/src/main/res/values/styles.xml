@@ -4,6 +4,7 @@
     <style name="Title">
         <item name="android:textSize">@dimen/sp_22</item>
         <item name="android:textColor">@color/YP_black</item>
+        <item name="android:gravity">center</item>
         <item name="fontFamily">@font/ys_display_medium</item>
         <item name="paddingStart">@dimen/dp_12</item>
     </style>
@@ -122,4 +123,17 @@
         <item name="tabIndicatorColor">?attr/colorOnSecondary</item>
         <item name="tabTextColor">?attr/colorOnSecondary</item>
     </style>
+
+    <style name="BottomNavigationView" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="backgroundTint">?attr/colorOnPrimary</item>
+        <item name="itemTextColor">@color/bottom_nav_color</item>
+        <item name="itemIconTint">@color/bottom_nav_color</item>
+        <item name="itemActiveIndicatorStyle">@null</item>
+        <item name="android:fontFamily">@font/ys_display_regular</item>
+        <item name="android:textSize">@dimen/sp_12</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="itemTextAppearanceActiveBoldEnabled">false</item>
+        <item name="android:textFontWeight">400</item>
+    </style>
 </resources>
+
