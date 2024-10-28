@@ -43,23 +43,18 @@ class SearchViewModel(
     }
 
     private fun processResult(foundTracks: List<Track>?, errorMessage: String?) {
-        if (foundTracks != null) {
-            when {
-                errorMessage != null -> {
-                    _searchScreenState.postValue(SearchScreenState.NoInternetError)
-                }
 
-                foundTracks.isEmpty() -> {
-                    _searchScreenState.postValue(SearchScreenState.NothingFound)
-                }
-
-                else -> {
-                    _searchScreenState.postValue(
-                        SearchScreenState.SearchQueryResults(
-                            foundTracks
-                        )
+        if (errorMessage != null) {
+            _searchScreenState.postValue(SearchScreenState.NoInternetError)
+        } else if (foundTracks != null) {
+            if (foundTracks.isEmpty()) {
+                _searchScreenState.postValue(SearchScreenState.NothingFound)
+            } else {
+                _searchScreenState.postValue(
+                    SearchScreenState.SearchQueryResults(
+                        foundTracks
                     )
-                }
+                )
             }
         }
     }
