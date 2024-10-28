@@ -7,29 +7,27 @@ import com.example.playlistmaker.search.data.mapper.TrackMapper
 import com.example.playlistmaker.search.domain.Resource
 import com.example.playlistmaker.search.domain.api.TracksRepository
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
 
-    companion object{
+    companion object {
         private const val NO_INTERNET_CONNECTION = -1
         private const val SUCCESSFUL_RESPONSE = 200
     }
 
-    override fun searchTracks(expression: String): Resource<List<Track>> {
+    override fun searchTracks(expression: String): Flow<Resource<List<Track>>> = flow {
         val response = networkClient.doRequest(TrackSearchRequest(expression))
 
-        return when (response.resultCode) {
-            NO_INTERNET_CONNECTION -> Resource.Error("No internet connection")
+        when (response.resultCode) {
+            NO_INTERNET_CONNECTION -> emit(Resource.Error("No internet connection"))
 
-            SUCCESSFUL_RESPONSE -> Resource.Success((response as TrackSearchResponse).results.map {
-                    TrackMapper.map(it)
-                }
-            )
+            SUCCESSFUL_RESPONSE -> emit(Resource.Success((response as TrackSearchResponse).results.map {
+                TrackMapper.map(it)
+            }))
 
-            else -> {
-                Resource.Error("Internal server error")
-            }
+            else -> emit(Resource.Error("Internal server error"))
         }
     }
-
 }

@@ -3,8 +3,6 @@ package com.example.playlistmaker.search.ui
 import android.content.Context.INPUT_METHOD_SERVICE
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -13,6 +11,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.example.playlistmaker.databinding.FragmentSearchBinding
 import com.example.playlistmaker.main.ui.activity.BindingFragment
 import com.example.playlistmaker.player.ui.PlayerActivity
@@ -20,6 +19,8 @@ import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.presentation.state.SearchScreenState
 import com.example.playlistmaker.search.presentation.view_model.SearchViewModel
 import com.google.gson.Gson
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class SearchFragment : BindingFragment<FragmentSearchBinding>() {
@@ -31,7 +32,6 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     }
 
     private val viewModel: SearchViewModel by viewModel()
-    private val handler = Handler(Looper.getMainLooper())
     private var isClickAllowed = true
 
     private val searchAdapter: SearchAdapter by lazy {
@@ -73,7 +73,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     private fun setupListeners() {
 
         binding.updateButton.setOnClickListener {
-            viewModel.repeatSearchQuery()
+            viewModel.searchWithoutDebounce()
         }
 
         binding.clearHistoryButton.setOnClickListener {
@@ -92,7 +92,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
         binding.searchField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                viewModel.repeatSearchQuery()
+                viewModel.searchWithoutDebounce()
             }
             false
         }
@@ -155,7 +155,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         val current = isClickAllowed
         if (isClickAllowed) {
             isClickAllowed = false
-            handler.postDelayed({ isClickAllowed = true }, CLICK_DEBOUNCE_DELAY)
+            viewLifecycleOwner.lifecycleScope.launch {
+                delay(CLICK_DEBOUNCE_DELAY)
+                isClickAllowed = true
+            }
         }
         return current
     }
