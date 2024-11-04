@@ -3,24 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="?attr/colorOnPrimary"
     android:orientation="vertical"
     tools:context=".media.ui.MediaFragment">
 
-    <LinearLayout
+    <com.google.android.material.appbar.MaterialToolbar
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingStart="@dimen/dp_16"
-        android:paddingEnd="@dimen/dp_52">
-
-        <TextView
-            style="@style/Title"
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/dp_48"
-            android:layout_gravity="center"
-            android:text="@string/media" />
-    </LinearLayout>
+        android:layout_height="@dimen/dp_56"
+        app:title="@string/media"
+        app:titleTextAppearance="@style/Toolbar.TitleText" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
