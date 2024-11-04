@@ -1,18 +1,21 @@
 package com.example.playlistmaker.player.presentation.view_model
 
-import android.os.Handler
-import android.os.Looper
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerInteractor) : ViewModel() {
 
-    private val handler = Handler(Looper.getMainLooper())
-    private val playbackRunnable = { playbackProgressCounter() }
+    companion object {
+        private const val TIMER_UPDATE_INTERVAL = 500L
+    }
 
     private val _playbackState = MutableLiveData<PlayerState>()
     val playbackState = _playbackState
@@ -20,6 +23,7 @@ class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerI
     private val _playbackProgress = MutableLiveData<Int>()
     val playbackProgress = _playbackProgress
 
+    private var timerJob: Job? = null
 
     init {
         playerInteractor.preparePlayer(currentTrack.previewUrl)
@@ -29,13 +33,13 @@ class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerI
     override fun onCleared() {
         super.onCleared()
         playerInteractor.releasePlayer()
-        handler.removeCallbacks(playbackRunnable)
+        timerJob?.cancel()
     }
 
     fun pausePlayer() {
         playerInteractor.pausePlayer()
         _playbackState.value = PlayerState.PAUSED
-        handler.removeCallbacks(playbackRunnable)
+        timerJob?.cancel()
     }
 
     fun playbackControl() {
@@ -43,7 +47,7 @@ class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerI
             PlayerState.PLAYING -> {
                 playerInteractor.pausePlayer()
                 _playbackState.value = PlayerState.PAUSED
-                handler.removeCallbacks(playbackRunnable)
+                timerJob?.cancel()
             }
 
             PlayerState.PREPARED -> {
@@ -64,15 +68,18 @@ class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerI
 
     private fun playbackProgressCounter() {
         val state = playerInteractor.getPlayerState()
-        if (state == PlayerState.PLAYING) {
-            _playbackProgress.value = playerInteractor.getCurrentPosition()
-            handler.postDelayed(playbackRunnable, 300)
+
+        timerJob = viewModelScope.launch {
+            while (state == PlayerState.PLAYING) {
+                delay(TIMER_UPDATE_INTERVAL)
+                _playbackProgress.postValue(playerInteractor.getCurrentPosition())
+            }
         }
     }
 
     private fun inTheEnd() {
         _playbackState.value = PlayerState.PREPARED
         _playbackProgress.value = 0
-        handler.removeCallbacks(playbackRunnable)
+        timerJob?.cancel()
     }
 }

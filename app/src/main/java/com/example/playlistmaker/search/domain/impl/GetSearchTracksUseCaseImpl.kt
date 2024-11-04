@@ -3,17 +3,24 @@ package com.example.playlistmaker.search.domain.impl
 import com.example.playlistmaker.search.domain.Resource
 import com.example.playlistmaker.search.domain.api.GetSearchTracksUseCase
 import com.example.playlistmaker.search.domain.api.TracksRepository
-import java.util.concurrent.Executors
+import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-class GetSearchTracksUseCaseImpl(private val repository: TracksRepository) : GetSearchTracksUseCase {
+class GetSearchTracksUseCaseImpl(private val repository: TracksRepository) :
+    GetSearchTracksUseCase {
 
-    private val executor = Executors.newCachedThreadPool()
+    override fun execute(expression: String): Flow<Pair<List<Track>?, String?>> {
 
-    override fun execute(expression: String, consumer: GetSearchTracksUseCase.TracksConsumer) {
-        executor.execute {
-            when(val resource = repository.searchTracks(expression)) {
-                is Resource.Success -> { consumer.consume(resource.value, null) }
-                is Resource.Error -> { consumer.consume(null, resource.message) }
+        return repository.searchTracks(expression).map { result ->
+            when (result) {
+                is Resource.Success -> {
+                    Pair(result.value, null)
+                }
+
+                is Resource.Error -> {
+                    Pair(null, result.message)
+                }
             }
         }
     }
