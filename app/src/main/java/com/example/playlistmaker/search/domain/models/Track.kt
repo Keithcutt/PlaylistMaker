@@ -1,6 +1,6 @@
 package com.example.playlistmaker.search.domain.models
 
-data class Track (
+data class Track(
     val trackName: String,
     val artistName: String,
     val trackTime: Long,
@@ -10,7 +10,8 @@ data class Track (
     val releaseDate: String,
     val primaryGenreName: String,
     val country: String,
-    val previewUrl: String
+    val previewUrl: String,
+    var isFavourite: Boolean = false
 ) {
     fun getCoverArtwork() = artworkUrl100.replaceAfterLast('/', "512x512bb.jpg")
 }

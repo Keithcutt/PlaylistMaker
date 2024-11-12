@@ -1,5 +1,6 @@
 package com.example.playlistmaker.search.data.repository
 
+import com.example.playlistmaker.media.data.db.AppDatabase
 import com.example.playlistmaker.search.data.NetworkClient
 import com.example.playlistmaker.search.data.dto.TrackSearchRequest
 import com.example.playlistmaker.search.data.dto.TrackSearchResponse
@@ -10,7 +11,10 @@ import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
-class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRepository {
+class TracksRepositoryImpl(
+    private val networkClient: NetworkClient,
+    private val appDatabase: AppDatabase
+) : TracksRepository {
 
     companion object {
         private const val NO_INTERNET_CONNECTION = -1
@@ -23,11 +27,25 @@ class TracksRepositoryImpl(private val networkClient: NetworkClient) : TracksRep
         when (response.resultCode) {
             NO_INTERNET_CONNECTION -> emit(Resource.Error("No internet connection"))
 
-            SUCCESSFUL_RESPONSE -> emit(Resource.Success((response as TrackSearchResponse).results.map {
-                TrackMapper.map(it)
-            }))
+            SUCCESSFUL_RESPONSE -> {
+
+                with(response as TrackSearchResponse) {
+                    val data = findFavourites(results.map { TrackMapper.map(it) })
+                    emit(Resource.Success(data))
+                }
+            }
+
 
             else -> emit(Resource.Error("Internal server error"))
+        }
+    }
+
+    private suspend fun findFavourites(tracks: List<Track>): List<Track> {
+        val favouriteIDsList = appDatabase.trackDao().getFavouriteIDs()
+        return tracks.map { track ->
+            track.apply {
+                isFavourite = favouriteIDsList.contains(trackId)
+            }
         }
     }
 }

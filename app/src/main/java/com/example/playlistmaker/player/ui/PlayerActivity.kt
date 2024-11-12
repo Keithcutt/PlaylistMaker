@@ -80,6 +80,10 @@ class PlayerActivity : AppCompatActivity() {
         binding.playButton.setOnClickListener {
             viewModel.playbackControl()
         }
+
+        binding.addToFavouriteButton.setOnClickListener {
+            viewModel.onFavouriteClicked()
+        }
     }
 
     private fun observeViewModel() {
@@ -89,6 +93,10 @@ class PlayerActivity : AppCompatActivity() {
 
         viewModel.playbackProgress.observe(this) { progressMillis ->
             playbackProgressCounter(progressMillis)
+        }
+
+        viewModel.favouriteStatus.observe(this) { status ->
+            favouriteButtonState(status)
         }
     }
 
@@ -120,5 +128,12 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun playbackProgressCounter(progressMillis: Int) {
         binding.playbackProgress.text = dateFormat.format(progressMillis)
+    }
+
+    private fun favouriteButtonState(isFavourite: Boolean) {
+        when (isFavourite) {
+            true -> binding.addToFavouriteButton.setImageResource(R.drawable.btn_like_active)
+            else -> binding.addToFavouriteButton.setImageResource(R.drawable.btn_like_inactive)
+        }
     }
 }

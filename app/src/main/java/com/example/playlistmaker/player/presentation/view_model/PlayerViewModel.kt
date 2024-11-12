@@ -3,15 +3,21 @@ package com.example.playlistmaker.player.presentation.view_model
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.playlistmaker.media.domain.db.FavouritesInteractor
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
-class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerInteractor) : ViewModel() {
+class PlayerViewModel(
+    private val currentTrack: Track,
+    private val playerInteractor: PlayerInteractor,
+    private val favouritesInteractor: FavouritesInteractor
+) : ViewModel() {
 
     companion object {
         private const val TIMER_UPDATE_INTERVAL = 500L
@@ -23,17 +29,42 @@ class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerI
     private val _playbackProgress = MutableLiveData<Int>()
     val playbackProgress = _playbackProgress
 
+    private val _favouriteStatus = MutableLiveData<Boolean>()
+    val favouriteStatus = _favouriteStatus
+
     private var timerJob: Job? = null
 
     init {
         playerInteractor.preparePlayer(currentTrack.previewUrl)
-        playerInteractor.setOnCompletionListener{ inTheEnd() }
+        playerInteractor.setOnCompletionListener { inTheEnd() }
+        // isFavouriteTrack(currentTrack)
+        _favouriteStatus.value = currentTrack.isFavourite
     }
 
     override fun onCleared() {
         super.onCleared()
         playerInteractor.releasePlayer()
         timerJob?.cancel()
+    }
+
+    fun onFavouriteClicked() {
+        viewModelScope.launch() {
+            if (!currentTrack.isFavourite) {
+                favouritesInteractor.insertTrack(currentTrack)
+            } else {
+                favouritesInteractor.deleteTrack(currentTrack)
+            }
+        }
+        _favouriteStatus.value = !currentTrack.isFavourite
+    }
+
+    private fun isFavouriteTrack(track: Track) {
+        viewModelScope.launch {
+            favouritesInteractor.favouriteTracks().collect { favouriteTracks ->
+                _favouriteStatus.value = favouriteTracks.contains(track)
+            }
+            currentTrack.isFavourite = _favouriteStatus.value ?: false
+        }
     }
 
     fun pausePlayer() {
@@ -43,7 +74,7 @@ class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerI
     }
 
     fun playbackControl() {
-        when(playerInteractor.getPlayerState()) {
+        when (playerInteractor.getPlayerState()) {
             PlayerState.PLAYING -> {
                 playerInteractor.pausePlayer()
                 _playbackState.value = PlayerState.PAUSED
@@ -62,6 +93,7 @@ class PlayerViewModel(currentTrack: Track, private val playerInteractor: PlayerI
                 playbackProgressCounter()
                 _playbackState.value = PlayerState.PLAYING
             }
+
             else -> {}
         }
     }
