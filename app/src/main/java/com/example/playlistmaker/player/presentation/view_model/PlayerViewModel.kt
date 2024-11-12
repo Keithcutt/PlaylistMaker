@@ -7,7 +7,6 @@ import com.example.playlistmaker.media.domain.db.FavouritesInteractor
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -37,7 +36,6 @@ class PlayerViewModel(
     init {
         playerInteractor.preparePlayer(currentTrack.previewUrl)
         playerInteractor.setOnCompletionListener { inTheEnd() }
-        // isFavouriteTrack(currentTrack)
         _favouriteStatus.value = currentTrack.isFavourite
     }
 
@@ -51,20 +49,14 @@ class PlayerViewModel(
         viewModelScope.launch() {
             if (!currentTrack.isFavourite) {
                 favouritesInteractor.insertTrack(currentTrack)
+                currentTrack.isFavourite = true
             } else {
                 favouritesInteractor.deleteTrack(currentTrack)
+                currentTrack.isFavourite = false
             }
+            _favouriteStatus.value = currentTrack.isFavourite
         }
-        _favouriteStatus.value = !currentTrack.isFavourite
-    }
 
-    private fun isFavouriteTrack(track: Track) {
-        viewModelScope.launch {
-            favouritesInteractor.favouriteTracks().collect { favouriteTracks ->
-                _favouriteStatus.value = favouriteTracks.contains(track)
-            }
-            currentTrack.isFavourite = _favouriteStatus.value ?: false
-        }
     }
 
     fun pausePlayer() {

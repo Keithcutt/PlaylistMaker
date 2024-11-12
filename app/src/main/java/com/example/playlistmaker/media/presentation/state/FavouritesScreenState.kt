@@ -4,5 +4,5 @@ import com.example.playlistmaker.search.domain.models.Track
 
 sealed interface FavouritesScreenState {
     data object EmptyScreen : FavouritesScreenState
-    class Content(val favouriteTracks: List<Track>) : FavouritesScreenState
+    class Favourites(val favouriteTracks: List<Track>) : FavouritesScreenState
 }

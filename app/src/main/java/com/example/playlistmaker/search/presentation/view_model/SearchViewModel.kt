@@ -104,4 +104,14 @@ class SearchViewModel(
             }
         }
     }
+
+    fun refreshFavourites() {
+        viewModelScope.launch {
+            searchHistoryInteractor.getSearchHistory().collect { tracks ->
+                _searchScreenState.value = SearchScreenState.SearchHistory(tracks)
+            }
+
+            searchQuery(searchQueryText)
+        }
+    }
 }

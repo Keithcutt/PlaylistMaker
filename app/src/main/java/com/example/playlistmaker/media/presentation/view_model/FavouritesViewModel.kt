@@ -13,10 +13,10 @@ class FavouritesViewModel(private val favouritesInteractor: FavouritesInteractor
     val favouritesScreenState = _favouritesScreenState
 
     init {
-        getFavourites()
+        refreshFavourites()
     }
 
-    private fun getFavourites() {
+    fun refreshFavourites() {
         viewModelScope.launch {
             favouritesInteractor.favouriteTracks().collect { tracks ->
 
@@ -26,7 +26,7 @@ class FavouritesViewModel(private val favouritesInteractor: FavouritesInteractor
                     )
                 } else {
                     favouritesScreenState.postValue(
-                        FavouritesScreenState.Content(tracks)
+                        FavouritesScreenState.Favourites(tracks)
                     )
                 }
             }

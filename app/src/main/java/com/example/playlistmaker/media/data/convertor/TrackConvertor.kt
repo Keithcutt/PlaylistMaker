@@ -16,7 +16,8 @@ object TrackConvertor {
             releaseDate = track.releaseDate,
             country = track.country,
             previewUrl = track.previewUrl,
-            collectionName = track.collectionName
+            collectionName = track.collectionName,
+            timestamp = System.currentTimeMillis()
         )
     }
 
@@ -31,7 +32,8 @@ object TrackConvertor {
             releaseDate = track.releaseDate,
             country = track.country,
             previewUrl = track.previewUrl,
-            collectionName = track.collectionName
+            collectionName = track.collectionName,
+            isFavourite = true
         )
     }
 }

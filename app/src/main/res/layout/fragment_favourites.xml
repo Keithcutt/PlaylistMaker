@@ -9,12 +9,13 @@
     tools:context=".media.ui.FavouritesFragment">
 
     <LinearLayout
-        android:id="@+id/placeholder_not_found"
+        android:id="@+id/placeholder"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/dp_104"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
@@ -30,5 +31,14 @@
             android:text="@string/empty_favourites_placeholder"
             android:textAlignment="center" />
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="@dimen/dp_16"
+        android:visibility="gone"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/track_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,10 +14,11 @@ class FavouritesInteractorImpl(
 
     override suspend fun deleteTrack(track: Track) {
         favouritesRepository.deleteTrack(track)
+        track.isFavourite = false
     }
 
     override fun favouriteTracks(): Flow<List<Track>> {
-        return favouritesRepository.favouriteTracks() // .map()
+        return favouritesRepository.favouriteTracks()
     }
 
 }

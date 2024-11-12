@@ -34,8 +34,8 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     private val viewModel: SearchViewModel by viewModel()
     private var isClickAllowed = true
 
-    private val searchAdapter: SearchAdapter by lazy {
-        SearchAdapter {
+    private val tracksAdapter: TracksAdapter by lazy {
+        TracksAdapter {
             viewModel.onClickEvent(it)
             startPlayerActivity(it)
         }
@@ -63,6 +63,12 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     override fun onDestroyView() {
         textWatcher.let { binding.searchField.removeTextChangedListener(it) }
         super.onDestroyView()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.refreshFavourites()
+        tracksAdapter.notifyDataSetChanged()
     }
 
     private fun initializeUI() {
@@ -204,8 +210,8 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         binding.progressBar.isVisible = false
         binding.searchHistoryViewGroup.isVisible = false
         binding.rvSearch.isVisible = true
-        searchAdapter.setTracks(foundTracks)
-        binding.rvSearch.adapter = searchAdapter
+        tracksAdapter.setTracks(foundTracks)
+        binding.rvSearch.adapter = tracksAdapter
     }
 
     private fun showSearchHistory(searchedTracks: List<Track>) {
@@ -214,8 +220,8 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
         binding.progressBar.isVisible = false
         binding.rvSearch.isVisible = false
         binding.searchHistoryViewGroup.isVisible = true
-        searchAdapter.setTracks(searchedTracks)
-        binding.rvSearchHistory.adapter = searchAdapter
+        tracksAdapter.setTracks(searchedTracks)
+        binding.rvSearchHistory.adapter = tracksAdapter
     }
 
     private fun showEmptyScreen() {
