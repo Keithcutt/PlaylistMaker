@@ -67,7 +67,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.refreshFavourites()
+        viewModel.refreshFavourites(binding.searchField.text.toString())
         tracksAdapter.notifyDataSetChanged()
     }
 

@@ -105,13 +105,18 @@ class SearchViewModel(
         }
     }
 
-    fun refreshFavourites() {
-        viewModelScope.launch {
-            searchHistoryInteractor.getSearchHistory().collect { tracks ->
-                _searchScreenState.value = SearchScreenState.SearchHistory(tracks)
+    fun refreshFavourites(input: String?) {
+        if (input?.isEmpty() == true) {
+            if (searchHistoryInteractor.isSearchHistoryNotEmpty()) {
+                showSearchHistory()
+            } else {
+                _searchScreenState.value = SearchScreenState.EmptyScreen
             }
-
-            searchQuery(searchQueryText)
+        } else if (input?.isBlank() == true) {
+            _searchScreenState.value = SearchScreenState.EmptyScreen
+        } else if (input == searchQueryText) {
+            searchJob?.cancel()
+            searchWithoutDebounce()
         }
     }
 }
