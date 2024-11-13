@@ -1,11 +1,18 @@
 package com.example.playlistmaker.search.data.repository
 
 import android.content.SharedPreferences
+import com.example.playlistmaker.media.data.db.AppDatabase
 import com.example.playlistmaker.search.domain.api.SearchHistoryRepository
 import com.example.playlistmaker.search.domain.models.Track
 import com.google.gson.Gson
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
-class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferences, private val gson: Gson) : SearchHistoryRepository {
+class SearchHistoryRepositoryImpl(
+    private val sharedPreferences: SharedPreferences,
+    private val gson: Gson,
+    private val appDatabase: AppDatabase
+) : SearchHistoryRepository {
     companion object {
         const val SEARCHED_TRACKS_KEY = "searched_tracks"
         const val EMPTY_STRING = ""
@@ -49,7 +56,10 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
             .apply()
     }
 
-    override fun getSearchHistory(): MutableList<Track> = searchedTracks
+    override fun getSearchHistory(): Flow<List<Track>> = flow {
+        findFavourites(searchedTracks)
+        emit(searchedTracks)
+    }
 
     override fun isSearchHistoryNotEmpty(): Boolean = searchedTracks.isNotEmpty()
     private fun createJsonFromTracks(tracks: MutableList<Track>): String {
@@ -58,5 +68,14 @@ class SearchHistoryRepositoryImpl(private val sharedPreferences: SharedPreferenc
 
     private fun createTracksFromJson(json: String): Array<Track> {
         return gson.fromJson(json, Array<Track>::class.java)
+    }
+
+    private suspend fun findFavourites(tracks: MutableList<Track>) {
+        val favouriteIDsList = appDatabase.trackDao().getFavouriteIDs()
+        tracks.map { track ->
+            track.apply {
+                isFavourite = favouriteIDsList.contains(trackId)
+            }
+        }
     }
 }

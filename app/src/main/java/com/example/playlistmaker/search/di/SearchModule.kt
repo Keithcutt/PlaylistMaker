@@ -31,8 +31,8 @@ val searchModule = module {
         )
     }
 
-    single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(), get()) }
-    single<TracksRepository> { TracksRepositoryImpl(get()) }
+    single<SearchHistoryRepository> { SearchHistoryRepositoryImpl(get(), get(), get()) }
+    single<TracksRepository> { TracksRepositoryImpl(get(), get()) }
 
     single<ITunesApiService> {
         Retrofit.Builder()

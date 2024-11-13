@@ -6,9 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.R
 import com.example.playlistmaker.search.domain.models.Track
 
-class SearchAdapter(
+class TracksAdapter(
     private val onTrackClick: (track: Track) -> Unit
-) : RecyclerView.Adapter<SearchViewHolder>() {
+) : RecyclerView.Adapter<TracksViewHolder>() {
 
     private var tracks: List<Track> = emptyList()
 
@@ -17,12 +17,12 @@ class SearchAdapter(
         this.tracks = tracks
         notifyDataSetChanged()
     }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SearchViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TracksViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.track_item, parent, false)
-        return SearchViewHolder(view)
+        return TracksViewHolder(view)
     }
 
-    override fun onBindViewHolder(holder: SearchViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: TracksViewHolder, position: Int) {
         holder.bind(tracks[position])
         holder.itemView.setOnClickListener{
             onTrackClick(tracks[position])

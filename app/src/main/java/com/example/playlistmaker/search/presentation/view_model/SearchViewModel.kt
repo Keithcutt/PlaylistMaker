@@ -86,8 +86,7 @@ class SearchViewModel(
 
         if (input?.isEmpty() == true) {
             if (searchHistoryInteractor.isSearchHistoryNotEmpty()) {
-                _searchScreenState.value =
-                    SearchScreenState.SearchHistory(searchHistoryInteractor.getSearchHistory())
+                showSearchHistory()
             } else {
                 _searchScreenState.value = SearchScreenState.EmptyScreen
             }
@@ -95,6 +94,29 @@ class SearchViewModel(
             _searchScreenState.value = SearchScreenState.EmptyScreen
         } else {
             searchWithDebounce()
+        }
+    }
+
+    private fun showSearchHistory() {
+        viewModelScope.launch {
+            searchHistoryInteractor.getSearchHistory().collect { tracks ->
+                _searchScreenState.value = SearchScreenState.SearchHistory(tracks)
+            }
+        }
+    }
+
+    fun refreshFavourites(input: String?) {
+        if (input?.isEmpty() == true) {
+            if (searchHistoryInteractor.isSearchHistoryNotEmpty()) {
+                showSearchHistory()
+            } else {
+                _searchScreenState.value = SearchScreenState.EmptyScreen
+            }
+        } else if (input?.isBlank() == true) {
+            _searchScreenState.value = SearchScreenState.EmptyScreen
+        } else if (input == searchQueryText) {
+            searchJob?.cancel()
+            searchWithoutDebounce()
         }
     }
 }
