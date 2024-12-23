@@ -1,8 +1,8 @@
 package com.example.playlistmaker.media.data.impl
 
-import com.example.playlistmaker.media.data.convertor.TrackConvertor
 import com.example.playlistmaker.media.data.db.AppDatabase
 import com.example.playlistmaker.media.data.db.entity.TrackEntity
+import com.example.playlistmaker.media.data.mapper.TrackEntityMapper
 import com.example.playlistmaker.media.domain.db.FavouritesRepository
 import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
@@ -30,10 +30,10 @@ class FavouritesRepositoryImpl(
     }
 
     private fun convertFromTrackEntity(tracks: List<TrackEntity>): List<Track> {
-        return tracks.map { track -> TrackConvertor.map(track) }
+        return tracks.map { track -> TrackEntityMapper.map(track) }
     }
 
     private fun convertToTrackEntity(track: Track): TrackEntity {
-        return TrackConvertor.map(track)
+        return TrackEntityMapper.map(track)
     }
 }

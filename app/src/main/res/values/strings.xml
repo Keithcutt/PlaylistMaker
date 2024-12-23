@@ -32,7 +32,27 @@
 
     <string name="favourite_tracks">Избранные треки</string>
     <string name="playlists">Плейлисты</string>
-    <string name="new_playlist_button">Новый плейлист</string>
+    <string name="new_playlist">Новый плейлист</string>
     <string name="empty_favourites_placeholder">Ваша медиатека пуста</string>
     <string name="empty_playlists_placeholder">Вы не создали \n ни одного плейлиста</string>
+    <string name="name">Название*</string>
+    <string name="description">Описание</string>
+    <string name="create">Создать</string>
+    <plurals name="playlist_track_count">
+        <item quantity="one">%1$d трек</item>
+        <item quantity="few">%1$d трека</item>
+        <item quantity="many">%1$d треков</item>
+        <item quantity="other">%1$d треков</item>
+    </plurals>
+
+    <string name="playlist_created">Плейлист %s создан</string>
+    <string name="dialog_alert_title">Завершить создание плейлиста?</string>
+    <string name="dialog_alert_message">Все несохраненные данные будут потеряны</string>
+    <string name="dialog_alert_positive">Завершить</string>
+    <string name="dialog_alert_neutral">Отмена</string>
+
+    <string name="mock_playlist_name">Неофолк в дорогу. Для настоящих мужиков!</string>
+    <string name="mock_playlist_track_count">228 треков</string>
+
+    <string name="add_to_playlist">Добавить в плейлист</string>
 </resources>

@@ -1,9 +1,9 @@
-package com.example.playlistmaker.media.data.convertor
+package com.example.playlistmaker.media.data.mapper
 
 import com.example.playlistmaker.media.data.db.entity.TrackEntity
 import com.example.playlistmaker.search.domain.models.Track
 
-object TrackConvertor {
+object TrackEntityMapper {
 
     fun map(track: Track): TrackEntity {
         return TrackEntity(

@@ -153,7 +153,7 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
 
     private fun hideKeyboard(view: View) {
         val inputMethodManager: InputMethodManager? =
-            requireContext().getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager //?????
+            requireContext().getSystemService(INPUT_METHOD_SERVICE) as? InputMethodManager
         inputMethodManager?.hideSoftInputFromWindow(view.windowToken, 0)
     }
 

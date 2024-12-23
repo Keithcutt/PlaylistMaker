@@ -4,9 +4,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.media.domain.db.FavouritesInteractor
+import com.example.playlistmaker.media.domain.db.PlaylistsInteractor
+import com.example.playlistmaker.media.domain.model.Playlist
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.search.domain.models.Track
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -15,12 +18,16 @@ import kotlinx.coroutines.launch
 class PlayerViewModel(
     private val currentTrack: Track,
     private val playerInteractor: PlayerInteractor,
-    private val favouritesInteractor: FavouritesInteractor
+    private val favouritesInteractor: FavouritesInteractor,
+    private val playlistsInteractor: PlaylistsInteractor
 ) : ViewModel() {
 
     companion object {
         private const val TIMER_UPDATE_INTERVAL = 500L
     }
+
+    private val _playlistCollection = MutableLiveData<List<Playlist>>(emptyList())
+    val playlistCollection = _playlistCollection
 
     private val _playbackState = MutableLiveData<PlayerState>()
     val playbackState = _playbackState
@@ -43,6 +50,14 @@ class PlayerViewModel(
         super.onCleared()
         playerInteractor.releasePlayer()
         timerJob?.cancel()
+    }
+
+    fun refreshPlaylistCollection() {
+        viewModelScope.launch(Dispatchers.IO) {
+            playlistsInteractor.getPlaylists().collect{ playlistCollection ->
+                _playlistCollection.postValue(playlistCollection)
+            }
+        }
     }
 
     fun onFavouriteClicked() {

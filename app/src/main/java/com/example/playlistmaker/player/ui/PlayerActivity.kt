@@ -3,15 +3,22 @@ package com.example.playlistmaker.player.ui
 import android.content.Context
 import android.os.Bundle
 import android.util.TypedValue
+import android.view.View
+import android.widget.LinearLayout
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
+import com.example.playlistmaker.media.domain.model.Playlist
+import com.example.playlistmaker.media.ui.NewPlaylistFragment
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.player.presentation.mapper.TrackMapper
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModel
+import com.example.playlistmaker.player.ui.state.BottomSheetState
 import com.example.playlistmaker.search.domain.models.Track
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf
@@ -32,6 +39,12 @@ class PlayerActivity : AppCompatActivity() {
 
     private val viewModel: PlayerViewModel by viewModel { parametersOf(currentTrack) }
 
+    private val playlistsAdapter: BottomSheetPlaylistsAdapter by lazy {
+        BottomSheetPlaylistsAdapter()
+    }
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayerBinding.inflate(layoutInflater)
@@ -41,6 +54,8 @@ class PlayerActivity : AppCompatActivity() {
         bindData(currentTrack)
 
         setupListeners()
+        setupBottomSheet()
+        initializeRecycler()
         observeViewModel()
     }
 
@@ -75,6 +90,12 @@ class PlayerActivity : AppCompatActivity() {
         ).toInt()
     }
 
+    private fun initializeRecycler() {
+        binding.recyclerView.layoutManager =
+            LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        binding.recyclerView.adapter = playlistsAdapter
+    }
+
     private fun setupListeners() {
         binding.backButton.setOnClickListener { finish() }
 
@@ -84,6 +105,19 @@ class PlayerActivity : AppCompatActivity() {
 
         binding.addToFavouriteButton.setOnClickListener {
             viewModel.onFavouriteClicked()
+        }
+
+        binding.addToPlaylistButton.setOnClickListener {
+            viewModel.refreshPlaylistCollection()
+            updateBottomSheetState(BottomSheetState.COLLAPSED)
+        }
+
+        binding.overlay.setOnClickListener {
+            updateBottomSheetState(BottomSheetState.HIDDEN)
+        }
+
+        binding.newPlaylistButton.setOnClickListener {
+            openNewPlaylistFragment()
         }
     }
 
@@ -99,7 +133,80 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.favouriteStatus.observe(this) { status ->
             favouriteButtonState(status)
         }
+
+        viewModel.playlistCollection.observe(this) { playlistCollection ->
+            showPlaylists(playlistCollection)
+        }
     }
+
+    private fun setupBottomSheet() {
+        bottomSheetBehavior =
+            BottomSheetBehavior.from(binding.bottomSheetContainer).apply {
+                state = BottomSheetBehavior.STATE_HIDDEN
+            }
+
+        bottomSheetBehavior.addBottomSheetCallback(object :
+            BottomSheetBehavior.BottomSheetCallback() {
+
+            override fun onStateChanged(bottomSheet: View, newState: Int) {
+
+                when (newState) {
+                    BottomSheetBehavior.STATE_HIDDEN -> {
+                        binding.overlay.visibility = View.GONE
+                    }
+
+                    else -> {
+                        binding.overlay.visibility = View.VISIBLE
+                    }
+                }
+            }
+
+            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                binding.overlay.alpha = (slideOffset + 1f) / (2f - (slideOffset + 1f))
+            }
+        })
+    }
+
+    private fun updateBottomSheetState(state: BottomSheetState) {
+        when (state) {
+            BottomSheetState.HIDDEN -> bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+            BottomSheetState.COLLAPSED -> bottomSheetBehavior.state =
+                BottomSheetBehavior.STATE_COLLAPSED
+
+            BottomSheetState.EXPANDED -> bottomSheetBehavior.state =
+                BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
+
+    private fun setFragmentContainerVisibility(showFragment: Boolean) {
+        binding.playerContainer.visibility = if (showFragment) View.GONE else View.VISIBLE
+        binding.fragmentContainer.visibility = if (showFragment) View.VISIBLE else View.GONE
+    }
+
+    private fun showPlaylists(playlists: List<Playlist>) {
+        playlistsAdapter.updatePlaylists(playlists)
+    }
+
+    private fun openNewPlaylistFragment() {
+        updateBottomSheetState(BottomSheetState.HIDDEN)
+        setFragmentContainerVisibility(true)
+
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, NewPlaylistFragment.newInstance(true))
+            .addToBackStack(null)
+            .commit()
+
+        supportFragmentManager.setFragmentResultListener(
+            NewPlaylistFragment.RESULT_KEY, this
+        ) { _, _ ->
+            updateBottomSheetState(BottomSheetState.COLLAPSED)
+            setFragmentContainerVisibility(false)
+            supportFragmentManager.popBackStack()
+            viewModel.refreshPlaylistCollection()
+        }
+
+    }
+
 
     private fun render(state: PlayerState) {
         when (state) {
@@ -130,6 +237,7 @@ class PlayerActivity : AppCompatActivity() {
     private fun playbackProgressCounter(progressMillis: Int) {
         binding.playbackProgress.text = dateFormat.format(progressMillis)
     }
+
 
     private fun favouriteButtonState(isFavourite: Boolean) {
         when (isFavourite) {
