@@ -6,7 +6,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.databinding.PlaylistItemPlayerScreenBinding
 import com.example.playlistmaker.media.domain.model.Playlist
 
-class BottomSheetPlaylistsAdapter : RecyclerView.Adapter<BottomSheetPlaylistsViewHolder>() {
+class BottomSheetPlaylistsAdapter(
+    private val onPlaylistClick: (playlist: Playlist) -> Unit
+) : RecyclerView.Adapter<BottomSheetPlaylistsViewHolder>() {
 
     private var playlists: List<Playlist> = emptyList()
 
@@ -30,6 +32,9 @@ class BottomSheetPlaylistsAdapter : RecyclerView.Adapter<BottomSheetPlaylistsVie
 
     override fun onBindViewHolder(holder: BottomSheetPlaylistsViewHolder, position: Int) {
         holder.bind(playlists[position])
+        holder.itemView.setOnClickListener {
+            onPlaylistClick(playlists[position])
+        }
     }
 
     override fun getItemCount(): Int {

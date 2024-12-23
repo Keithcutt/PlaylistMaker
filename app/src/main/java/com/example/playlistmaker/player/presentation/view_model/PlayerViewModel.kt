@@ -3,11 +3,12 @@ package com.example.playlistmaker.player.presentation.view_model
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.media.domain.db.FavouritesInteractor
-import com.example.playlistmaker.media.domain.db.PlaylistsInteractor
+import com.example.playlistmaker.media.domain.db_api.FavouritesInteractor
+import com.example.playlistmaker.media.domain.db_api.PlaylistsInteractor
 import com.example.playlistmaker.media.domain.model.Playlist
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
+import com.example.playlistmaker.player.presentation.state.AddingTrackToPlaylistStatus
 import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -26,9 +27,6 @@ class PlayerViewModel(
         private const val TIMER_UPDATE_INTERVAL = 500L
     }
 
-    private val _playlistCollection = MutableLiveData<List<Playlist>>(emptyList())
-    val playlistCollection = _playlistCollection
-
     private val _playbackState = MutableLiveData<PlayerState>()
     val playbackState = _playbackState
 
@@ -37,6 +35,12 @@ class PlayerViewModel(
 
     private val _favouriteStatus = MutableLiveData<Boolean>()
     val favouriteStatus = _favouriteStatus
+
+    private val _playlistCollection = MutableLiveData<List<Playlist>>(emptyList())
+    val playlistCollection = _playlistCollection
+
+    private val _trackAdded = MutableLiveData<AddingTrackToPlaylistStatus>()
+    val trackAdded = _trackAdded
 
     private var timerJob: Job? = null
 
@@ -50,6 +54,17 @@ class PlayerViewModel(
         super.onCleared()
         playerInteractor.releasePlayer()
         timerJob?.cancel()
+    }
+
+    fun addTrackToPlaylist(track: Track, playlist: Playlist) {
+        if (track.trackId in playlist.trackIdsList) {
+           _trackAdded.postValue(AddingTrackToPlaylistStatus.TrackAlreadyIn(playlist.playlistName))
+        } else {
+            viewModelScope.launch {
+                playlistsInteractor.addTrackToPlaylist(track, playlist)
+            }
+            _trackAdded.postValue(AddingTrackToPlaylistStatus.TrackAdded(playlist.playlistName))
+        }
     }
 
     fun refreshPlaylistCollection() {
@@ -71,7 +86,6 @@ class PlayerViewModel(
             }
             _favouriteStatus.value = currentTrack.isFavourite
         }
-
     }
 
     fun pausePlayer() {

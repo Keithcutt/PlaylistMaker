@@ -71,7 +71,7 @@ class SearchHistoryRepositoryImpl(
     }
 
     private suspend fun findFavourites(tracks: MutableList<Track>) {
-        val favouriteIDsList = appDatabase.trackDao().getFavouriteIDs()
+        val favouriteIDsList = appDatabase.favouriteTrackDao().getFavouriteIDs()
         tracks.map { track ->
             track.apply {
                 isFavourite = favouriteIDsList.contains(trackId)

@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.playlistmaker.media.domain.db.PlaylistsInteractor
+import com.example.playlistmaker.media.domain.db_api.PlaylistsInteractor
 import com.example.playlistmaker.media.domain.local_storage_api.SavePlaylistCoverUseCase
 import com.example.playlistmaker.media.domain.model.Playlist
 import kotlinx.coroutines.launch

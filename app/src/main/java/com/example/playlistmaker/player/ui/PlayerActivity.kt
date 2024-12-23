@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.TypedValue
 import android.view.View
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -15,6 +16,7 @@ import com.example.playlistmaker.media.domain.model.Playlist
 import com.example.playlistmaker.media.ui.NewPlaylistFragment
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.player.presentation.mapper.TrackMapper
+import com.example.playlistmaker.player.presentation.state.AddingTrackToPlaylistStatus
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModel
 import com.example.playlistmaker.player.ui.state.BottomSheetState
 import com.example.playlistmaker.search.domain.models.Track
@@ -28,7 +30,7 @@ import java.util.Locale
 class PlayerActivity : AppCompatActivity() {
 
     private companion object {
-        const val ARTWORK_CORNER_RADIUS = 8
+        const val ARTWORK_CORNER_RADIUS = 8f
     }
 
     private lateinit var binding: ActivityPlayerBinding
@@ -40,7 +42,9 @@ class PlayerActivity : AppCompatActivity() {
     private val viewModel: PlayerViewModel by viewModel { parametersOf(currentTrack) }
 
     private val playlistsAdapter: BottomSheetPlaylistsAdapter by lazy {
-        BottomSheetPlaylistsAdapter()
+        BottomSheetPlaylistsAdapter {
+            onPlaylistClickListener(it)
+        }
     }
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<LinearLayout>
@@ -77,7 +81,7 @@ class PlayerActivity : AppCompatActivity() {
         Glide.with(this@PlayerActivity)
             .load(model.getCoverArtwork())
             .centerCrop()
-            .transform(RoundedCorners(dpToPx(ARTWORK_CORNER_RADIUS.toFloat(), this@PlayerActivity)))
+            .transform(RoundedCorners(dpToPx(ARTWORK_CORNER_RADIUS, this@PlayerActivity)))
             .placeholder(R.drawable.placeholder_237x234)
             .into(binding.trackCover)
     }
@@ -137,6 +141,31 @@ class PlayerActivity : AppCompatActivity() {
         viewModel.playlistCollection.observe(this) { playlistCollection ->
             showPlaylists(playlistCollection)
         }
+
+        viewModel.trackAdded.observe(this) { status ->
+            makeToast(status)
+        }
+    }
+
+    private fun makeToast(status: AddingTrackToPlaylistStatus) {
+        when (status) {
+            is AddingTrackToPlaylistStatus.TrackAdded -> Toast.makeText(
+                this@PlayerActivity,
+                getString(R.string.track_added_to_playlist).format(status.playlistName),
+                Toast.LENGTH_SHORT
+            ).show()
+
+            is AddingTrackToPlaylistStatus.TrackAlreadyIn -> Toast.makeText(
+                this@PlayerActivity,
+                getString(R.string.track_is_already_in).format(status.playlistName),
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun onPlaylistClickListener(playlist: Playlist) {
+        viewModel.addTrackToPlaylist(currentTrack, playlist)
+        updateBottomSheetState(BottomSheetState.HIDDEN)
     }
 
     private fun setupBottomSheet() {

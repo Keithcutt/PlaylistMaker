@@ -41,7 +41,7 @@ class TracksRepositoryImpl(
     }
 
     private suspend fun findFavourites(tracks: List<Track>): List<Track> {
-        val favouriteIDsList = appDatabase.trackDao().getFavouriteIDs()
+        val favouriteIDsList = appDatabase.favouriteTrackDao().getFavouriteIDs()
         return tracks.map { track ->
             track.apply {
                 isFavourite = favouriteIDsList.contains(trackId)

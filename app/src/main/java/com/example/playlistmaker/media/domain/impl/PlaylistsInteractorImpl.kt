@@ -1,8 +1,9 @@
 package com.example.playlistmaker.media.domain.impl
 
-import com.example.playlistmaker.media.domain.db.PlaylistsInteractor
-import com.example.playlistmaker.media.domain.db.PlaylistsRepository
+import com.example.playlistmaker.media.domain.db_api.PlaylistsInteractor
+import com.example.playlistmaker.media.domain.db_api.PlaylistsRepository
 import com.example.playlistmaker.media.domain.model.Playlist
+import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.flow.Flow
 
 class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsRepository) :
@@ -11,11 +12,11 @@ class PlaylistsInteractorImpl(private val playlistsRepository: PlaylistsReposito
         playlistsRepository.insertPlaylist(playlist)
     }
 
-    override suspend fun updatePlaylist(playlist: Playlist) {
-        playlistsRepository.updatePlaylist(playlist)
-    }
-
     override fun getPlaylists(): Flow<List<Playlist>> {
         return playlistsRepository.getPlaylists()
+    }
+
+    override suspend fun addTrackToPlaylist(track: Track, playlist: Playlist) {
+        playlistsRepository.addTrackToPlaylist(track, playlist)
     }
 }

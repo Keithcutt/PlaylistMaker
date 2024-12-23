@@ -5,10 +5,10 @@ import com.example.playlistmaker.media.data.db.AppDatabase
 import com.example.playlistmaker.media.data.impl.FavouritesRepositoryImpl
 import com.example.playlistmaker.media.data.impl.PlaylistRepositoryImpl
 import com.example.playlistmaker.media.data.mapper.PlaylistEntityMapper
-import com.example.playlistmaker.media.domain.db.FavouritesInteractor
-import com.example.playlistmaker.media.domain.db.FavouritesRepository
-import com.example.playlistmaker.media.domain.db.PlaylistsInteractor
-import com.example.playlistmaker.media.domain.db.PlaylistsRepository
+import com.example.playlistmaker.media.domain.db_api.FavouritesInteractor
+import com.example.playlistmaker.media.domain.db_api.FavouritesRepository
+import com.example.playlistmaker.media.domain.db_api.PlaylistsInteractor
+import com.example.playlistmaker.media.domain.db_api.PlaylistsRepository
 import com.example.playlistmaker.media.domain.impl.FavouritesInteractorImpl
 import com.example.playlistmaker.media.domain.impl.PlaylistsInteractorImpl
 import com.google.gson.Gson
@@ -32,13 +32,10 @@ val dataBaseModule = module {
 
 
     single { Gson() }
-
     single<PlaylistEntityMapper> { PlaylistEntityMapper(get()) }
-
     single<PlaylistsRepository> {
         PlaylistRepositoryImpl(get(), get())
     }
-
     single<PlaylistsInteractor> {
         PlaylistsInteractorImpl(get())
     }
