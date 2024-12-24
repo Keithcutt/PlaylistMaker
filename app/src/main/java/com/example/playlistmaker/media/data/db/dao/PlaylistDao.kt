@@ -17,5 +17,5 @@ interface PlaylistDao {
     suspend fun updatePlaylist(playlist: PlaylistEntity)
 
     @Query("SELECT * FROM playlists_table")
-    fun getPlaylists(): List<PlaylistEntity>
+    suspend fun getPlaylists(): List<PlaylistEntity>
 }

@@ -12,7 +12,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.ActivityPlayerBinding
-import com.example.playlistmaker.media.domain.model.Playlist
+import com.example.playlistmaker.media.presentation.model.PlaylistUIModel
 import com.example.playlistmaker.media.ui.NewPlaylistFragment
 import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.player.presentation.mapper.TrackMapper
@@ -142,7 +142,7 @@ class PlayerActivity : AppCompatActivity() {
             showPlaylists(playlistCollection)
         }
 
-        viewModel.trackAdded.observe(this) { status ->
+        viewModel.trackAddedStatus.observe(this) { status ->
             makeToast(status)
         }
     }
@@ -163,7 +163,7 @@ class PlayerActivity : AppCompatActivity() {
         }
     }
 
-    private fun onPlaylistClickListener(playlist: Playlist) {
+    private fun onPlaylistClickListener(playlist: PlaylistUIModel) {
         viewModel.addTrackToPlaylist(currentTrack, playlist)
         updateBottomSheetState(BottomSheetState.HIDDEN)
     }
@@ -212,7 +212,7 @@ class PlayerActivity : AppCompatActivity() {
         binding.fragmentContainer.visibility = if (showFragment) View.VISIBLE else View.GONE
     }
 
-    private fun showPlaylists(playlists: List<Playlist>) {
+    private fun showPlaylists(playlists: List<PlaylistUIModel>) {
         playlistsAdapter.updatePlaylists(playlists)
     }
 

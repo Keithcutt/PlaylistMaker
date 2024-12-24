@@ -14,9 +14,10 @@ class LocalStorageRepositoryImpl(private val appContext: Context) : LocalStorage
     companion object {
         private const val ALBUM_NAME = "playlistsAlbum"
         private const val COVER_QUALITY_30 = 30
+        private const val LAST_TEN_DIGITS = 10
     }
 
-    override fun savePlaylistCover(uri: String) {
+    override fun savePlaylistCover(uri: String): String {
 
         val filePath =
             File(appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), ALBUM_NAME)
@@ -25,7 +26,7 @@ class LocalStorageRepositoryImpl(private val appContext: Context) : LocalStorage
             filePath.mkdirs()
         }
 
-        val fileName = "playlist_cover_${uri.takeLast(10)}.jpg"
+        val fileName = "playlist_cover_${uri.takeLast(LAST_TEN_DIGITS)}.jpg"
         val file = File(filePath, fileName)
 
         val inputStream = appContext.contentResolver.openInputStream(Uri.parse(uri))
@@ -37,5 +38,15 @@ class LocalStorageRepositoryImpl(private val appContext: Context) : LocalStorage
 
         inputStream?.close()
         outputStream.close()
+
+        return fileName
+    }
+
+    override fun getPlaylistCover(fileName: String): String {
+        val filePath =
+            File(appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES), ALBUM_NAME)
+        val file = File(filePath, fileName)
+        val uri = Uri.fromFile(file)
+        return uri.toString()
     }
 }

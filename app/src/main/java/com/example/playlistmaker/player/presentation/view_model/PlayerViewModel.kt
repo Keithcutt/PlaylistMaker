@@ -1,13 +1,17 @@
 package com.example.playlistmaker.player.presentation.view_model
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.playlistmaker.media.domain.db_api.FavouritesInteractor
 import com.example.playlistmaker.media.domain.db_api.PlaylistsInteractor
 import com.example.playlistmaker.media.domain.model.Playlist
+import com.example.playlistmaker.media.presentation.mapper.PlaylistUIMapper
+import com.example.playlistmaker.media.presentation.model.PlaylistUIModel
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
+import com.example.playlistmaker.player.presentation.single_live_event.SingleLiveEvent
 import com.example.playlistmaker.player.presentation.state.AddingTrackToPlaylistStatus
 import com.example.playlistmaker.search.domain.models.Track
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +24,8 @@ class PlayerViewModel(
     private val currentTrack: Track,
     private val playerInteractor: PlayerInteractor,
     private val favouritesInteractor: FavouritesInteractor,
-    private val playlistsInteractor: PlaylistsInteractor
+    private val playlistsInteractor: PlaylistsInteractor,
+    private val playlistUIMapper: PlaylistUIMapper
 ) : ViewModel() {
 
     companion object {
@@ -28,21 +33,22 @@ class PlayerViewModel(
     }
 
     private val _playbackState = MutableLiveData<PlayerState>()
-    val playbackState = _playbackState
+    val playbackState: LiveData<PlayerState> = _playbackState
 
     private val _playbackProgress = MutableLiveData<Int>()
-    val playbackProgress = _playbackProgress
+    val playbackProgress: LiveData<Int> = _playbackProgress
 
     private val _favouriteStatus = MutableLiveData<Boolean>()
-    val favouriteStatus = _favouriteStatus
+    val favouriteStatus: LiveData<Boolean> = _favouriteStatus
 
-    private val _playlistCollection = MutableLiveData<List<Playlist>>(emptyList())
-    val playlistCollection = _playlistCollection
+    private val _playlistCollection = MutableLiveData<List<PlaylistUIModel>>(emptyList())
+    val playlistCollection: LiveData<List<PlaylistUIModel>> = _playlistCollection
 
-    private val _trackAdded = MutableLiveData<AddingTrackToPlaylistStatus>()
-    val trackAdded = _trackAdded
+    private val _trackAddedStatus = SingleLiveEvent<AddingTrackToPlaylistStatus>()
+    val trackAddedStatus: LiveData<AddingTrackToPlaylistStatus> = _trackAddedStatus
 
     private var timerJob: Job? = null
+    private var currentPlaylistCollection: List<Playlist> = mutableListOf()
 
     init {
         playerInteractor.preparePlayer(currentTrack.previewUrl)
@@ -56,23 +62,36 @@ class PlayerViewModel(
         timerJob?.cancel()
     }
 
-    fun addTrackToPlaylist(track: Track, playlist: Playlist) {
+    fun addTrackToPlaylist(track: Track, playlist: PlaylistUIModel) {
         if (track.trackId in playlist.trackIdsList) {
-           _trackAdded.postValue(AddingTrackToPlaylistStatus.TrackAlreadyIn(playlist.playlistName))
+            _trackAddedStatus.postValue(AddingTrackToPlaylistStatus.TrackAlreadyIn(playlist.playlistName))
         } else {
             viewModelScope.launch {
-                playlistsInteractor.addTrackToPlaylist(track, playlist)
+                val matchingPlaylist =
+                    currentPlaylistCollection.find { it.playlistId == playlist.playlistId }
+                if (matchingPlaylist != null) {
+                    playlistsInteractor.addTrackToPlaylist(track, matchingPlaylist)
+                }
             }
-            _trackAdded.postValue(AddingTrackToPlaylistStatus.TrackAdded(playlist.playlistName))
+            _trackAddedStatus.postValue(AddingTrackToPlaylistStatus.TrackAdded(playlist.playlistName))
         }
     }
 
     fun refreshPlaylistCollection() {
         viewModelScope.launch(Dispatchers.IO) {
-            playlistsInteractor.getPlaylists().collect{ playlistCollection ->
-                _playlistCollection.postValue(playlistCollection)
+            playlistsInteractor.getPlaylists().collect { playlistCollection ->
+
+                currentPlaylistCollection = playlistCollection
+
+                _playlistCollection.postValue(
+                    mapPlaylistCollectionToUIPlaylistCollection(playlistCollection)
+                )
             }
         }
+    }
+
+    private fun mapPlaylistCollectionToUIPlaylistCollection(playlistCollection: List<Playlist>): List<PlaylistUIModel> {
+        return playlistCollection.map { playlist -> playlistUIMapper.map(playlist) }
     }
 
     fun onFavouriteClicked() {

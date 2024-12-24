@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.playlistmaker.R
 import com.example.playlistmaker.databinding.FragmentPlaylistsBinding
 import com.example.playlistmaker.main.ui.activity.BindingFragment
-import com.example.playlistmaker.media.domain.model.Playlist
+import com.example.playlistmaker.media.presentation.model.PlaylistUIModel
 import com.example.playlistmaker.media.presentation.state.PlaylistsScreenState
 import com.example.playlistmaker.media.presentation.view_model.PlaylistsViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -71,7 +71,7 @@ class PlaylistsFragment : BindingFragment<FragmentPlaylistsBinding>() {
         binding.recyclerView.isVisible = false
     }
 
-    private fun showContent(playlists: List<Playlist>) {
+    private fun showContent(playlists: List<PlaylistUIModel>) {
         binding.placeholderNotFound.isVisible = false
         binding.recyclerView.isVisible = true
         playlistsAdapter.updatePlaylists(playlists)

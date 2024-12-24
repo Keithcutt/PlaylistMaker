@@ -1,10 +1,12 @@
-package com.example.playlistmaker.media.domain.model
+package com.example.playlistmaker.media.presentation.model
 
-data class Playlist(
+import android.net.Uri
+
+data class PlaylistUIModel(
     val playlistId: Int,
     val playlistName: String,
     val description: String?,
-    val coverFileName: String?,
+    val coverUri: Uri?,
     var trackIdsList: List<Int>,
     var trackCount: Int
 )

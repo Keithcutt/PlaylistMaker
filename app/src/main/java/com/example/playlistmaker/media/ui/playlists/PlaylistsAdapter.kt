@@ -4,15 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.playlistmaker.databinding.PlaylistItemBinding
-import com.example.playlistmaker.media.domain.model.Playlist
+import com.example.playlistmaker.media.presentation.model.PlaylistUIModel
 
 class PlaylistsAdapter :
     RecyclerView.Adapter<PlaylistsViewHolder>() {
 
-    private var playlists: List<Playlist> = emptyList()
+    private var playlists: List<PlaylistUIModel> = emptyList()
 
     @Suppress("notifyDataSetChanged")
-    fun updatePlaylists(newPlaylists: List<Playlist>) {
+    fun updatePlaylists(newPlaylists: List<PlaylistUIModel>) {
         playlists = newPlaylists
         notifyDataSetChanged()
     }

@@ -12,7 +12,7 @@ class PlaylistEntityMapper(private val gson: Gson) {
             playlistId = playlist.playlistId,
             playlistName = playlist.playlistName,
             description = playlist.description,
-            coverUri = playlist.coverUri,
+            coverFileName = playlist.coverFileName,
             trackIdsJson = gson.toJson(playlist.trackIdsList),
             trackCount = playlist.trackCount
         )
@@ -23,7 +23,7 @@ class PlaylistEntityMapper(private val gson: Gson) {
             playlistId = entity.playlistId,
             playlistName = entity.playlistName,
             description = entity.description,
-            coverUri = entity.coverUri,
+            coverFileName = entity.coverFileName,
             trackIdsList = gson.fromJson(
                 entity.trackIdsJson,
                 object : TypeToken<List<Int>>() {}.type
