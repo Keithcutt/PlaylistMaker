@@ -5,7 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?attr/colorOnPrimary"
-    tools:context=".media.ui.PlaylistsFragment">
+    android:fitsSystemWindows="true"
+    tools:context=".media.ui.playlists.PlaylistsFragment">
 
 
     <com.google.android.material.button.MaterialButton
@@ -15,7 +16,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="@dimen/dp_24"
-        android:text="@string/new_playlist_button"
+        android:text="@string/new_playlist"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -28,6 +29,7 @@
         android:layout_marginTop="@dimen/dp_104"
         android:gravity="center_horizontal"
         android:orientation="vertical"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -45,5 +47,21 @@
             android:text="@string/empty_playlists_placeholder"
             android:textAlignment="center" />
     </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="@dimen/dp_12"
+        android:layout_marginTop="@dimen/dp_8"
+        android:clipToPadding="false"
+        android:fitsSystemWindows="true"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/new_playlist_button"
+        tools:itemCount="3"
+        tools:listitem="@layout/playlist_item" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

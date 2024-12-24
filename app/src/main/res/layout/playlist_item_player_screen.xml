@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tool="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorOnPrimary"
+    app:cardCornerRadius="0dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorOnPrimary"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/dp_12">
+
+        <androidx.constraintlayout.utils.widget.ImageFilterView
+            android:id="@+id/playlist_cover"
+            android:layout_width="@dimen/dp_45"
+            android:layout_height="@dimen/dp_45"
+            android:layout_marginVertical="@dimen/dp_8"
+            android:layout_marginEnd="@dimen/dp_8"
+            app:round="@dimen/dp_4"
+            tool:src="@drawable/ic_placeholder_35x35" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="@dimen/dp_14"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/playlist_name"
+                style="@style/TrackItemText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tool:text="@string/mock_playlist_name" />
+
+            <TextView
+                android:id="@+id/playlist_track_count"
+                style="@style/TrackItemText.BottomText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                tool:text="@string/mock_playlist_track_count" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

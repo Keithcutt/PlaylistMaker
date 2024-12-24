@@ -22,9 +22,10 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class FavouritesFragment : BindingFragment<FragmentFavouritesBinding>() {
 
     companion object {
-        fun newInstance() = FavouritesFragment()
         private const val CLICK_DEBOUNCE_DELAY = 1000L
         private const val TRACK_KEY = "track"
+
+        fun newInstance() = FavouritesFragment()
     }
 
     private val viewModel: FavouritesViewModel by viewModel()
@@ -99,6 +100,4 @@ class FavouritesFragment : BindingFragment<FragmentFavouritesBinding>() {
         tracksAdapter.setTracks(favouriteTracks)
         binding.recyclerView.adapter = tracksAdapter
     }
-
-
 }

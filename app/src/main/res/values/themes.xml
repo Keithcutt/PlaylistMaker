@@ -9,4 +9,9 @@
         <item name="textGrayToBlack">@color/YP_text_gray</item>
         <item name="lightGrayToWhite">@color/YP_light_gray</item>
     </style>
+
+    <style name="AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="colorPrimary">@color/YP_blue</item>
+    </style>
+
 </resources>

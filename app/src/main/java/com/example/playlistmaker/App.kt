@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.media.di.dataBaseModule
 import com.example.playlistmaker.media.di.favouritesModule
+import com.example.playlistmaker.media.di.newPlaylistModule
 import com.example.playlistmaker.media.di.playlistsModule
 import com.example.playlistmaker.player.di.playerModule
 import com.example.playlistmaker.search.di.searchModule
@@ -39,7 +40,8 @@ class App : Application() {
                 sharingModule,
                 favouritesModule,
                 playlistsModule,
-                dataBaseModule
+                dataBaseModule,
+                newPlaylistModule
             )
         }
 
