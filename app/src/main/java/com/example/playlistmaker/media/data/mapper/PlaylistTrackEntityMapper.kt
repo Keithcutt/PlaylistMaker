@@ -17,7 +17,23 @@ object PlaylistTrackEntityMapper {
             country = track.country,
             previewUrl = track.previewUrl,
             collectionName = track.collectionName,
-            timestamp = System.currentTimeMillis()
+            isfavourite = track.isFavourite
+        )
+    }
+
+    fun map(trackEntity: PlaylistTrackEntity): Track {
+        return Track(
+            trackId = trackEntity.trackId,
+            trackName = trackEntity.trackName,
+            artistName = trackEntity.artistName,
+            trackTime = trackEntity.trackTime,
+            artworkUrl100 = trackEntity.artworkUrl100,
+            primaryGenreName = trackEntity.primaryGenreName,
+            releaseDate = trackEntity.releaseDate,
+            country = trackEntity.country,
+            previewUrl = trackEntity.previewUrl,
+            collectionName = trackEntity.collectionName,
+            isFavourite = trackEntity.isfavourite
         )
     }
 }

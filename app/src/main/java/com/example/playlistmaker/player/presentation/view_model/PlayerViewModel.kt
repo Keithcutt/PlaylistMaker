@@ -11,9 +11,9 @@ import com.example.playlistmaker.media.presentation.mapper.PlaylistUIMapper
 import com.example.playlistmaker.media.presentation.model.PlaylistUIModel
 import com.example.playlistmaker.player.domain.interactor.PlayerInteractor
 import com.example.playlistmaker.player.domain.state.PlayerState
-import com.example.playlistmaker.player.presentation.single_live_event.SingleLiveEvent
 import com.example.playlistmaker.player.presentation.state.AddingTrackToPlaylistStatus
 import com.example.playlistmaker.search.domain.models.Track
+import com.example.playlistmaker.util.single_live_event.SingleLiveEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay

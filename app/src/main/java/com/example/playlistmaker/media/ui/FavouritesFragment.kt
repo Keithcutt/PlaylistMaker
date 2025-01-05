@@ -32,9 +32,9 @@ class FavouritesFragment : BindingFragment<FragmentFavouritesBinding>() {
     private var isClickAllowed = true
 
     private val tracksAdapter: TracksAdapter by lazy {
-        TracksAdapter {
+        TracksAdapter ({
             startPlayerActivity(it)
-        }
+        })
     }
 
     override fun createBinding(

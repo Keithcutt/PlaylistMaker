@@ -1,4 +1,4 @@
-package com.example.playlistmaker.player.ui.state
+package com.example.playlistmaker.util.state
 
 enum class BottomSheetState {
     HIDDEN, COLLAPSED, EXPANDED

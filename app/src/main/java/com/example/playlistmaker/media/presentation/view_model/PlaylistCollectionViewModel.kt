@@ -8,17 +8,17 @@ import com.example.playlistmaker.media.domain.db_api.PlaylistsInteractor
 import com.example.playlistmaker.media.domain.model.Playlist
 import com.example.playlistmaker.media.presentation.mapper.PlaylistUIMapper
 import com.example.playlistmaker.media.presentation.model.PlaylistUIModel
-import com.example.playlistmaker.media.presentation.state.PlaylistsScreenState
+import com.example.playlistmaker.media.presentation.state.PlaylistCollectionScreenState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class PlaylistsViewModel(
+class PlaylistCollectionViewModel(
     private val playlistsInteractor: PlaylistsInteractor,
     private val playlistUIMapper: PlaylistUIMapper
 ) : ViewModel() {
 
-    private val _playlistsScreenState = MutableLiveData<PlaylistsScreenState>()
-    val playlistsScreenState: LiveData<PlaylistsScreenState> = _playlistsScreenState
+    private val _playlistCollectionScreenState = MutableLiveData<PlaylistCollectionScreenState>()
+    val playlistCollectionScreenState: LiveData<PlaylistCollectionScreenState> = _playlistCollectionScreenState
 
     init {
         refreshPlaylists()
@@ -29,13 +29,13 @@ class PlaylistsViewModel(
             playlistsInteractor.getPlaylists().collect { playlistCollection ->
 
                 if (playlistCollection.isEmpty()) {
-                    _playlistsScreenState.postValue(
-                        PlaylistsScreenState.Placeholder
+                    _playlistCollectionScreenState.postValue(
+                        PlaylistCollectionScreenState.Placeholder
                     )
                 } else {
 
-                    _playlistsScreenState.postValue(
-                        PlaylistsScreenState.Content(
+                    _playlistCollectionScreenState.postValue(
+                        PlaylistCollectionScreenState.Content(
                             mapPlaylistCollectionToUIPlaylistCollection(playlistCollection)
                         )
                     )

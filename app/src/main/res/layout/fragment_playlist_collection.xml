@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/colorOnPrimary"
     android:fitsSystemWindows="true"
-    tools:context=".media.ui.playlists.PlaylistsFragment">
+    tools:context=".media.ui.playlist_collection_screen.PlaylistCollectionFragment">
 
 
     <com.google.android.material.button.MaterialButton
