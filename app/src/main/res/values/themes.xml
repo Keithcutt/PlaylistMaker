@@ -14,4 +14,13 @@
         <item name="colorPrimary">@color/YP_blue</item>
     </style>
 
+    <style name="RemovingAlertDialog" parent="AlertDialog">
+        <item name="android:background">@color/YP_white</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialog.App.Title.Text</item>
+    </style>
+
+    <style name="MaterialAlertDialog.App.Title.Text" parent="MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textColor">@color/YP_black</item>
+    </style>
+
 </resources>

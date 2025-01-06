@@ -35,10 +35,10 @@ class SearchFragment : BindingFragment<FragmentSearchBinding>() {
     private var isClickAllowed = true
 
     private val tracksAdapter: TracksAdapter by lazy {
-        TracksAdapter {
+        TracksAdapter({
             viewModel.onClickEvent(it)
             startPlayerActivity(it)
-        }
+        })
     }
 
     private val textWatcher: TextWatcher by lazy {

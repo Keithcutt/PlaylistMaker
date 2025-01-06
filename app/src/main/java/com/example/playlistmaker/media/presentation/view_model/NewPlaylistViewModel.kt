@@ -10,7 +10,7 @@ import com.example.playlistmaker.media.domain.local_storage_api.LocalStorageInte
 import com.example.playlistmaker.media.domain.model.Playlist
 import kotlinx.coroutines.launch
 
-class NewPlaylistViewModel(
+open class NewPlaylistViewModel(
     private val playlistsInteractor: PlaylistsInteractor,
     private val localStorageInteractor: LocalStorageInteractor
 ) : ViewModel() {
@@ -18,9 +18,9 @@ class NewPlaylistViewModel(
     private val _isAnythingProvided = MutableLiveData(false)
     val isAnythingProvided: LiveData<Boolean> = _isAnythingProvided
 
-    private var playlistName: String = ""
-    private var playlistDescription: String? = null
-    private var playlistCoverFileName: String? = null
+    protected var playlistName: String = ""
+    protected var playlistDescription: String? = null
+    protected var playlistCoverFileName: String? = null
 
 
     fun createPlaylist() {
@@ -36,7 +36,6 @@ class NewPlaylistViewModel(
                 )
             )
         }
-
     }
 
     fun setPlaylistCover(uri: Uri) {
@@ -45,7 +44,7 @@ class NewPlaylistViewModel(
         _isAnythingProvided.postValue(true)
     }
 
-    fun setPlaylistName(name: String) {
+    fun updatePlaylistName(name: String) {
         if (name.isNotBlank()) {
             _isAnythingProvided.postValue(true)
         } else if (playlistDescription == null && playlistCoverFileName == null && name.isBlank()) {
@@ -55,7 +54,7 @@ class NewPlaylistViewModel(
         playlistName = name
     }
 
-    fun setPlaylistDescription(description: String?) {
+    fun updatePlaylistDescription(description: String?) {
         if (description == null && playlistName == "" && playlistCoverFileName == null) {
             _isAnythingProvided.postValue(false)
         } else if (description?.isNotBlank() == true) {

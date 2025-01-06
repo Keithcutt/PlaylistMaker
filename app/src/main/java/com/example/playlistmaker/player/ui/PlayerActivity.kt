@@ -18,7 +18,7 @@ import com.example.playlistmaker.player.domain.state.PlayerState
 import com.example.playlistmaker.player.presentation.mapper.TrackMapper
 import com.example.playlistmaker.player.presentation.state.AddingTrackToPlaylistStatus
 import com.example.playlistmaker.player.presentation.view_model.PlayerViewModel
-import com.example.playlistmaker.player.ui.state.BottomSheetState
+import com.example.playlistmaker.util.state.BottomSheetState
 import com.example.playlistmaker.search.domain.models.Track
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import org.koin.android.ext.android.inject
@@ -149,11 +149,15 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun makeToast(status: AddingTrackToPlaylistStatus) {
         when (status) {
-            is AddingTrackToPlaylistStatus.TrackAdded -> Toast.makeText(
-                this@PlayerActivity,
-                getString(R.string.track_added_to_playlist).format(status.playlistName),
-                Toast.LENGTH_SHORT
-            ).show()
+            is AddingTrackToPlaylistStatus.TrackAdded -> {
+                Toast.makeText(
+                    this@PlayerActivity,
+                    getString(R.string.track_added_to_playlist).format(status.playlistName),
+                    Toast.LENGTH_SHORT
+                ).show()
+                updateBottomSheetState(BottomSheetState.HIDDEN)
+            }
+
 
             is AddingTrackToPlaylistStatus.TrackAlreadyIn -> Toast.makeText(
                 this@PlayerActivity,
@@ -165,7 +169,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun onPlaylistClickListener(playlist: PlaylistUIModel) {
         viewModel.addTrackToPlaylist(currentTrack, playlist)
-        updateBottomSheetState(BottomSheetState.HIDDEN)
     }
 
     private fun setupBottomSheet() {

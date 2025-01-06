@@ -1,4 +1,4 @@
-package com.example.playlistmaker.player.presentation.single_live_event
+package com.example.playlistmaker.util.single_live_event
 
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData

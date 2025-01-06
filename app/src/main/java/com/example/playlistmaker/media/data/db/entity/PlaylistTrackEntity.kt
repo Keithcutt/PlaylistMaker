@@ -16,5 +16,6 @@ data class PlaylistTrackEntity(
     val primaryGenreName: String,
     val country: String,
     val previewUrl: String,
-    val timestamp: Long
+    // val timestamp: Long,
+    val isfavourite: Boolean
 )

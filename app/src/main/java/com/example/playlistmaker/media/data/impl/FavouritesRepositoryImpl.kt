@@ -16,12 +16,16 @@ class FavouritesRepositoryImpl(
         appDatabase.favouriteTrackDao().insertTrack(
             convertToTrackEntity(track)
         )
+
+        appDatabase.playlistTrackDao().updateFavouriteStatus(trackId = track.trackId, isFavourite = true)
     }
 
     override suspend fun deleteTrack(track: Track) {
         appDatabase.favouriteTrackDao().deleteTrack(
             convertToTrackEntity(track)
         )
+
+        appDatabase.playlistTrackDao().updateFavouriteStatus(trackId = track.trackId, isFavourite = false)
     }
 
     override fun favouriteTracks(): Flow<List<Track>> = flow {
