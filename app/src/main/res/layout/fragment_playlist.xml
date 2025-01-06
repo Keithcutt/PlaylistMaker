@@ -137,6 +137,7 @@
         android:orientation="vertical"
         android:visibility="gone"
         app:behavior_hideable="false"
+        app:behavior_peekHeight="@dimen/dp_208"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <ImageView

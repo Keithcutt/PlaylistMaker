@@ -149,11 +149,15 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun makeToast(status: AddingTrackToPlaylistStatus) {
         when (status) {
-            is AddingTrackToPlaylistStatus.TrackAdded -> Toast.makeText(
-                this@PlayerActivity,
-                getString(R.string.track_added_to_playlist).format(status.playlistName),
-                Toast.LENGTH_SHORT
-            ).show()
+            is AddingTrackToPlaylistStatus.TrackAdded -> {
+                Toast.makeText(
+                    this@PlayerActivity,
+                    getString(R.string.track_added_to_playlist).format(status.playlistName),
+                    Toast.LENGTH_SHORT
+                ).show()
+                updateBottomSheetState(BottomSheetState.HIDDEN)
+            }
+
 
             is AddingTrackToPlaylistStatus.TrackAlreadyIn -> Toast.makeText(
                 this@PlayerActivity,
@@ -165,7 +169,6 @@ class PlayerActivity : AppCompatActivity() {
 
     private fun onPlaylistClickListener(playlist: PlaylistUIModel) {
         viewModel.addTrackToPlaylist(currentTrack, playlist)
-        updateBottomSheetState(BottomSheetState.HIDDEN)
     }
 
     private fun setupBottomSheet() {

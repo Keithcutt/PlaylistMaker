@@ -75,6 +75,7 @@
     <string name="delete_playlist">Удалить плейлист</string>
     <string name="delete_playlist_dialog_message">Хотите удалить плейлист «%s»?</string>
     <string name="no_tracks_to_share_message">В этом плейлисте нет списка треков, которым можно поделиться</string>
+    <string name="no_tracks_message">В этом плейлисте пока нет треков</string>
 
     <string name="save">Сохранить</string>
     <string name="edit">Редактировать</string>

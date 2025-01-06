@@ -46,13 +46,17 @@ class ExternalNavigatorImpl(private val context: Context) : ExternalNavigator {
         playlist: Playlist,
         tracksFromPlaylist: List<Track>
     ): String {
-        var message = "${playlist.playlistName}\n" +
-                "${playlist.description}\n" +
-                context.resources.getQuantityString(
-                    R.plurals.playlist_track_count,
-                    playlist.trackCount,
-                    playlist.trackCount
-                ) + "\n\n"
+        var message = "${playlist.playlistName}\n"
+
+        if (playlist.description != null) {
+            message += "${playlist.description}\n"
+        }
+
+        message += context.resources.getQuantityString(
+            R.plurals.playlist_track_count,
+            playlist.trackCount,
+            playlist.trackCount
+        ) + "\n\n"
 
         for (i in tracksFromPlaylist.indices) {
             val trackTimeMmSs =

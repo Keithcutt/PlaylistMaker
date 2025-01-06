@@ -39,7 +39,6 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     private val viewmodel: PlaylistViewModel by viewModel { parametersOf(playlistId) }
     private var isClickAllowed = true
     private lateinit var menuBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
-    private lateinit var tracksBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     private val tracksFromPlaylistAdapter by lazy {
         TracksAdapter({
@@ -68,7 +67,6 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         getPlaylistId()
         setupRecyclerView()
         setupListeners()
-        setupTracksBottomSheet()
         setupMenuBottomSheet()
         observeViewModel()
     }
@@ -122,11 +120,11 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         }
 
         binding.overlay.setOnClickListener {
-            updateBottomSheetState(BottomSheetState.HIDDEN)
+            updateMenuBottomSheetState(BottomSheetState.HIDDEN)
         }
 
         binding.menuButton.setOnClickListener {
-            updateBottomSheetState(BottomSheetState.COLLAPSED)
+            updateMenuBottomSheetState(BottomSheetState.COLLAPSED)
         }
 
         binding.shareButton.setOnClickListener {
@@ -134,7 +132,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         }
 
         binding.bottomSheetShareButton.setOnClickListener {
-            updateBottomSheetState(BottomSheetState.HIDDEN)
+            updateMenuBottomSheetState(BottomSheetState.HIDDEN)
             viewmodel.sharePlaylist(playlistId)
         }
 
@@ -257,20 +255,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         })
     }
 
-    private fun setupTracksBottomSheet() {
-        tracksBottomSheetBehavior =
-            BottomSheetBehavior.from(binding.tracksBottomSheetContainer).apply {
-                val displayMetrics = resources.displayMetrics
-                val screenHeight = displayMetrics.heightPixels
-
-                peekHeight = when {
-                    screenHeight <= 1920 -> R.dimen.dp_100
-                    else -> R.dimen.dp_208
-                }
-            }
-    }
-
-    private fun updateBottomSheetState(state: BottomSheetState) {
+    private fun updateMenuBottomSheetState(state: BottomSheetState) {
         when (state) {
             BottomSheetState.HIDDEN -> menuBottomSheetBehavior.state =
                 BottomSheetBehavior.STATE_HIDDEN
@@ -303,6 +288,8 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     private fun hideTracks() {
         binding.tracksBottomSheetContainer.isVisible = false
+        Toast.makeText(requireContext(), getString(R.string.no_tracks_message), Toast.LENGTH_SHORT)
+            .show()
     }
 
     companion object {
