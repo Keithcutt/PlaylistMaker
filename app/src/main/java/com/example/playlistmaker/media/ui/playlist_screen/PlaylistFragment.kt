@@ -39,6 +39,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     private val viewmodel: PlaylistViewModel by viewModel { parametersOf(playlistId) }
     private var isClickAllowed = true
     private lateinit var menuBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
+    private lateinit var tracksBottomSheetBehavior: BottomSheetBehavior<LinearLayout>
 
     private val tracksFromPlaylistAdapter by lazy {
         TracksAdapter({
@@ -64,11 +65,11 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         getPlaylistId()
         setupRecyclerView()
         setupListeners()
-        setupBottomSheet()
+        setupTracksBottomSheet()
+        setupMenuBottomSheet()
         observeViewModel()
     }
 
@@ -228,7 +229,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             }.show()
     }
 
-    private fun setupBottomSheet() {
+    private fun setupMenuBottomSheet() {
         menuBottomSheetBehavior =
             BottomSheetBehavior.from(binding.menuBottomSheetContainer).apply {
                 state = BottomSheetBehavior.STATE_HIDDEN
@@ -254,6 +255,19 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
                 binding.overlay.alpha = (slideOffset + 1f) / (2f - (slideOffset + 1f))
             }
         })
+    }
+
+    private fun setupTracksBottomSheet() {
+        tracksBottomSheetBehavior =
+            BottomSheetBehavior.from(binding.tracksBottomSheetContainer).apply {
+                val displayMetrics = resources.displayMetrics
+                val screenHeight = displayMetrics.heightPixels
+
+                peekHeight = when {
+                    screenHeight <= 1920 -> R.dimen.dp_100
+                    else -> R.dimen.dp_208
+                }
+            }
     }
 
     private fun updateBottomSheetState(state: BottomSheetState) {

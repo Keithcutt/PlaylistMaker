@@ -36,7 +36,4 @@
     <dimen name="sp_20">20sp</dimen>
     <dimen name="sp_22">22sp</dimen>
     <dimen name="sp_24">24sp</dimen>
-
-    <dimen name="playlist_tracks_bottom_sheet_peek_height">264dp</dimen>
-
 </resources>
