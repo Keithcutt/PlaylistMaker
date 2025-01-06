@@ -137,7 +137,7 @@
         android:orientation="vertical"
         android:visibility="gone"
         app:behavior_hideable="false"
-        app:behavior_peekHeight="@dimen/dp_208"
+        app:behavior_peekHeight="@dimen/playlist_tracks_bottom_sheet_peek_height"
         app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
         <ImageView
@@ -164,7 +164,8 @@
         android:orientation="vertical"
         app:behavior_hideable="true"
         app:behavior_peekHeight="@dimen/dp_372"
-        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+        tools:visibility="gone">
 
         <ImageView
             android:layout_width="wrap_content"

@@ -19,6 +19,7 @@ import com.example.playlistmaker.main.ui.activity.BindingFragment
 import com.example.playlistmaker.media.presentation.model.PlaylistUIModel
 import com.example.playlistmaker.media.presentation.state.PlaylistScreenState
 import com.example.playlistmaker.media.presentation.view_model.PlaylistViewModel
+import com.example.playlistmaker.media.ui.EditPlaylistFragment
 import com.example.playlistmaker.player.ui.PlayerActivity
 import com.example.playlistmaker.search.domain.models.Track
 import com.example.playlistmaker.search.ui.TracksAdapter
@@ -56,6 +57,7 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
 
     override fun onResume() {
         super.onResume()
+        viewmodel.refreshPlaylistDetails(playlistId)
         viewmodel.getTracksFromPlaylist(playlistId)
     }
 
@@ -138,6 +140,10 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
         binding.bottomSheetDeleteButton.setOnClickListener {
             deletePlaylist(playlistId)
         }
+
+        binding.bottomSheetEditButton.setOnClickListener {
+            openEditScreen()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -189,6 +195,13 @@ class PlaylistFragment : BindingFragment<FragmentPlaylistBinding>() {
             playerIntent.putExtra(TRACK_KEY, Gson().toJson(track))
             startActivity(playerIntent)
         }
+    }
+
+    private fun openEditScreen() {
+        findNavController().navigate(
+            R.id.action_playlistFragment_to_editPlaylistFragment,
+            EditPlaylistFragment.createArgs(playlistId)
+        )
     }
 
     private fun deletePlaylist(playlistId: Int) {

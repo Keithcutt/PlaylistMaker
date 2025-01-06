@@ -6,7 +6,7 @@ import android.content.res.Configuration
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.playlistmaker.media.di.dataBaseModule
 import com.example.playlistmaker.media.di.favouritesModule
-import com.example.playlistmaker.media.di.newPlaylistModule
+import com.example.playlistmaker.media.di.editPlaylistModule
 import com.example.playlistmaker.media.di.playlistCollectionModule
 import com.example.playlistmaker.media.di.playlistModule
 import com.example.playlistmaker.player.di.playerModule
@@ -42,7 +42,7 @@ class App : Application() {
                 favouritesModule,
                 playlistCollectionModule,
                 dataBaseModule,
-                newPlaylistModule,
+                editPlaylistModule,
                 playlistModule
             )
         }

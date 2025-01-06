@@ -109,6 +109,12 @@ class PlaylistRepositoryImpl(
         }
     }
 
+    override suspend fun updatePlaylist(playlist: Playlist) {
+        appDatabase.playlistDao().updatePlaylist(
+            playlistEntityMapper.map(playlist)
+        )
+    }
+
     private suspend fun shouldDeleteTrackFromDB(trackId: Int): Boolean {
         val playlistCollection = convertToPlaylists(appDatabase.playlistDao().getPlaylists())
 

@@ -27,7 +27,7 @@ import com.example.playlistmaker.media.presentation.view_model.NewPlaylistViewMo
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class NewPlaylistFragment(private val fromPlayer: Boolean = false) :
+open class NewPlaylistFragment(private val fromPlayer: Boolean = false) :
     BindingFragment<FragmentNewPlaylistBinding>() {
 
     companion object {
@@ -38,7 +38,7 @@ class NewPlaylistFragment(private val fromPlayer: Boolean = false) :
 
     private var playlistName: String = ""
     private var isAnythingProvided = false
-    private val viewModel: NewPlaylistViewModel by viewModel()
+    open val viewModel: NewPlaylistViewModel by viewModel()
     private lateinit var pickMedia: ActivityResultLauncher<PickVisualMediaRequest>
 
     private val dialogAlert: MaterialAlertDialogBuilder by lazy {
@@ -114,7 +114,7 @@ class NewPlaylistFragment(private val fromPlayer: Boolean = false) :
                 binding.createButton.isEnabled = !s.isNullOrBlank()
 
                 playlistName = binding.nameTextField.editText?.text.toString()
-                viewModel.setPlaylistName(playlistName)
+                viewModel.updatePlaylistName(playlistName)
             }
 
             override fun afterTextChanged(s: Editable?) {}
@@ -127,9 +127,9 @@ class NewPlaylistFragment(private val fromPlayer: Boolean = false) :
 
                 val description = binding.descriptionTextField.editText?.text.toString()
                 if (description.isNotBlank()) {
-                    viewModel.setPlaylistDescription(description)
+                    viewModel.updatePlaylistDescription(description)
                 } else {
-                    viewModel.setPlaylistDescription(null)
+                    viewModel.updatePlaylistDescription(null)
                 }
             }
 
@@ -172,7 +172,7 @@ class NewPlaylistFragment(private val fromPlayer: Boolean = false) :
         }
     }
 
-    private fun dpToPx(dp: Float, context: Context): Int {
+    protected fun dpToPx(dp: Float, context: Context): Int {
         return TypedValue.applyDimension(
             TypedValue.COMPLEX_UNIT_DIP,
             dp,

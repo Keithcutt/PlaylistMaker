@@ -38,7 +38,7 @@ class PlaylistViewModel(
     val noTracksToShare: LiveData<Boolean> = _noTracksToShare
 
     init {
-        getPlaylistDetails(currentPlaylistId)
+        refreshPlaylistDetails(currentPlaylistId)
         getPlaylistDuration(currentPlaylistId)
         getTracksFromPlaylist(currentPlaylistId)
     }
@@ -113,7 +113,7 @@ class PlaylistViewModel(
         }
     }
 
-    private fun getPlaylistDetails(playlistId: Int) {
+    fun refreshPlaylistDetails(playlistId: Int) {
         viewModelScope.launch(Dispatchers.IO) {
             playlistsInteractor.getPlaylistById(playlistId).collect { playlist ->
                 _playlistDetails.postValue(
